@@ -30,8 +30,8 @@ If you are new to using Git and the terminal, use this cheat sheet to help you n
 The very first time you want to get this code on your computer, open your terminal (in VS Code, Command Prompt, or Git Bash) and run:
 
 ```bash
-git clone https://github.com/MuhammadKhuram/Fyp-Project-Paper.git
-cd autonomous-weeding-robot
+git clone https://github.com/MuhammadKhuram/Fyp-Project-Paper.git C:\Users\MUHAMMAD_KHURAM\Desktop\Fyp-Project-Paper\Fyp-Project-Paper
+cd "C:\Users\MUHAMMAD_KHURAM\Desktop\Fyp-Project-Paper\Fyp-Project-Paper"
 ```
 
 
