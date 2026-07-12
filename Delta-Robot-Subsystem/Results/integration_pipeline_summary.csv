@@ -1,0 +1,5 @@
+metric,value
+n_detected,6
+n_reachable,5
+n_unreachable,1
+cycle_time_s,2.62

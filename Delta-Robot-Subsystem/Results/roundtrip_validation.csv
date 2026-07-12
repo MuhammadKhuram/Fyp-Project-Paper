@@ -1,0 +1,5 @@
+target_xyz,recovered_xyz,error_mm
+"(20, 30, -150)","(np.float64(20.0), np.float64(30.0), np.float64(-150.0))",5.341e-14
+"(-90, 60, -160)","(np.float64(-90.0), np.float64(60.0), np.float64(-160.0))",4.019e-14
+"(80, 20, -180)","(np.float64(80.0), np.float64(20.0), np.float64(-180.0))",7.461e-14
+"(10, -90, -200)","(np.float64(10.0), np.float64(-90.0), np.float64(-200.0))",2.864e-14
