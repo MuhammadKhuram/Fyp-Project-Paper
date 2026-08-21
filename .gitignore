@@ -1,0 +1,3 @@
+# Ignore CropCraft virtual environment and output folder containing images, masks, labels and blend files
+cropcraft/venv/
+cropcraft/output/

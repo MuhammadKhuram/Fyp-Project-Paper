@@ -1,0 +1,412 @@
+## Example of a configuration file
+
+```yaml
+output_enabled: [blender, gazebo, usd]
+output:
+  blender:
+    type: blender_file
+    filename: mixed_field.blend
+  gazebo:
+    type: gazebo_model
+    name: mixed_field
+  usd:
+    type: usd_file
+    filename: mixed_field.usd
+
+field:
+  headland_width: 8.
+  bed_width: 1.57
+  y_function: '.2 * sin(x * tau / 15.)'
+  plants_count: 100
+  beds_count: 2
+  plant_distance: .15
+
+  beds:
+    bed1:  
+      plant_type: bean
+      plant_height: .12
+      height_tolerance_coeff: .3
+      row_distance: .4
+      rows_count: 3
+    bed2:  
+      plant_type: maize
+      plant_height: .40
+      row_distance: .785
+      rows_count: 2
+
+  noise:
+    position: .008
+    tilt: .05
+    missing: .15
+    scale: .10
+
+  weeds:
+    portulaca:
+      plant_type: portulaca
+      density: 3.
+      max_height: .02
+    polygonum:
+      plant_type: polygonum
+      distance_min: 0.16
+    taraxacum:
+      plant_type: taraxacum
+      density: 10.
+      noise_offset: -0.1
+
+  stones:
+    density: 60.
+    noise_scale: 0.24
+
+render:
+  directory: render
+  frames: 10
+  samples: 32
+  cycles_device: GPU
+  resolution_x: 1920
+  resolution_y: 1080
+  camera:
+    height: 1.6
+    fov_deg: 60.0
+    roll_deg: 0.0
+    pitch_deg: 0.0
+    yaw_deg: 0.0
+    y_jitter: 0.1
+```
+
+Here is the image corresponding to this configuration:
+![configuration example](/doc/imgs/config_example.png)
+
+
+## Description of the configuration format
+
+### Root elements of the configuration file
+
+* `field`: a block that contains the parameters of the generated field
+* `output`: a block where each element correspond to a named output configuration
+* `output_enabled` (optional): a list of output configuration name that are used when the program
+  is executed.
+  If it is not specified, all defined output are applied.
+* `render` (optional): a block that enables image capture (RGB images + semantic masks).
+  See the [render block](#the-render-block) section below.
+
+### The `field` block
+
+```yaml
+field:
+  headland_width: 7.0
+  scattering_extra_width: 1.5
+  random_seed: 344567809264
+  beds:
+    my_bed1:
+      ...
+    my_bed2:
+      ...
+  noise: {}
+  weeds:
+    weed1:
+      ...
+    weed2:
+      ...
+  stones: {}
+```
+
+* `headland_width` (default: 4.0, in meters): an extra band of ground around the field.
+* `scattering_extra_width` (default: 1.0, in meters): an extra band around the field used to
+  generate scattering.
+* `random_seed` (optional): integer used to initialize the random number generator.
+  If this element is specified, the generated environment will always be the same if the program is
+  executed several times with no change in its configuration.
+  The program outputs its seed in order to use it in a configuration file and generate a similar
+  environment.
+* `beds`: a block that contains the configuration of each bed to generate.
+  The key correspond to the name of the bed and the value is a bed block (described below).
+* `noise` (optional): a block that contains the noise configuration.
+* `weeds` (optional): a block that contains the configuration of each weed scattering.
+* `stones` (optional): a block that contains the stones scattering configuration.
+
+It is also possible to specify the parameters of the bed block directly in the `field` block.
+In this case, these parameters are used as default values for the beds.
+
+#### The bed block
+
+```yaml
+my_bed1:
+  plant_type: bean
+  plant_height: .12
+  height_tolerance_coeff: .3
+  row_distance: .52
+  rows_count: 3
+  bed_width: 1.57
+  plants_count: 100
+  beds_count: 10
+  plant_distance: .15
+  length: 15.
+  shift_next_bed: false
+  offset: [0., .3, 0.]
+  y_function: '1.4 * sin(x * tau / 15.)'
+  aligned: false
+```
+
+It corresponds to the element of the `beds` block of the `field`.
+The key corresponds to the name of the bed.
+
+* `plant_type`: allows to select the model group.
+  The current types available are `maize` and `bean`.
+* `plant_height` (in meters): the desired height for the plants.
+  The models are grouped by height and are rescaled to correspond to the desired height.
+* `height_tolerance_coeff`(default: 0.2): a tolerance coefficient for the plant height. The models will be selected within `(1 ± height_tolerance_coeff)* plant_height`.  
+* `plant_distance` (in meters): the distance between each crop in a row.
+* `bed_width` (in meters): the with of the bed.
+  The next bed will be generated with an offset corresponding to the `bed_width` multiplied by
+  `bed_count` but only if `shift_next_bed` is disabled.
+* `row_distance` (in meters): distance between two consecutive rows in the bed.
+* `plants_count`: number of plants in a row. `crops_count` is also accepted.
+* `length`: (in meters) length of the bed.
+  It is used to compute the number of plants (only if `plants_count` is not specified)
+* `rows_count` (default: 1): number of rows in a bed.
+* `beds_count` (default: 1): number of bed (the same configuration is repeated).
+* `shift_next_bed` (default: true): a boolean to enable/disable the shift of the next bed.
+  If disabled, the next bed configuration will cover the previous one.
+* `offset` (default: [0, 0, 0], in meters): a (x,y,z) offset applied to all crops of the bed
+* `y_function` (default: '0.0'): a string representing a python expression used to apply a lateral
+  offset depending of the `x` coordinate.
+  It is equivalent to write a function _y = f(x)_ where _y_ is the lateral offset and _x_ the
+  position in the row.
+  You can use the `x` variable, any functions of the python `math` module and some built-in
+  functions like `abs`, `min` or `max`.
+* `orientation` (choice: [`random`, `aligned`, `zero`], default: `random`): if the orientation is
+  `random`, the plant is oriented using a uniform distribution between 0° and 360°.
+  If it is `aligned`, the angle will be 0° or 180°.
+  If it is `zero`, the angle will be only 0°.
+
+#### The `noise` block
+
+```yaml
+noise:
+  position: .008
+  tilt: .05
+  scale: .10
+  missing: .15
+```
+
+* `position` (in meters): standard deviation of a centered normal distribution.
+  It is applied on the _x_ and _y_ axis of the position.
+* `tilt` (in radians): standard deviation of a centered normal distribution.
+  It is applied on the _roll_ and _pitch_ angle of the orientation.
+* `scale` (coefficient): standard deviation of a log-normal distribution (with mu = 0)
+* `missing` (between 0 and 1): probability that a crop is missing.
+
+#### The weeds block
+
+```yaml
+weeds:
+  test_weed1:
+    plant_type: portulaca
+    density: 3.5
+    distance_min: 0.15
+    noise_scale: 0.29
+    noise_offset: 0.21
+  test_weed2:
+    plant_type: polygonum
+    density: 4.9
+```
+
+The `weeds` block of the `field` contains several key/value that correspond to a name and a
+scattering configuration block.
+
+* `plant_type`: a string that corresponds to the name of the weed model
+* `max_height` (in meters, default: 0.1): the maximum height of weed models to include
+* `density`: a float that control the quantity of weeds that is generated
+* `distance_min` (in meters, default: 0.12): minimal distance between generated weeds
+* `scattering_mode` (default:'noise'): a string setting the mode of the scattering.
+'noise' uses a random pattern controlled by the parameters `noise_scale` and `noise_offset`.
+'image' uses a grayscale image to control the density
+* `noise_scale` (default: 0.36): a float that control the size of the roughness of the random
+  density map.
+  If the value is smaller, the blob will be bigger.
+* `noise_offset` (between -1.0 and 1.0, default: 0.1): a float that control the thickness of the
+  empty area.
+  If the value is smaller, the empty area will be bigger.
+* `scattering_img`: the density image path (relative to the configuration file)
+
+#### The `stones` block
+
+```yaml
+stones:
+  density: 50.0
+  distance_min: 0.04
+  noise_scale: 0.36
+  noise_offset: 0.23
+```
+
+* `density`: a float that control the quantity of stones that is generated
+* `distance_min` (in meters, default: 0.04): minimal distance between generated stones
+* `noise_scale` (default: 0.36): a float that control the size of the roughness of the random
+  density map.
+  If the value is smaller, the blob will be bigger.
+* `noise_offset` (between -1.0 and 1.0, default: 0.23): a float that control the thickness of the
+  empty area.
+  If the value is smaller, the empty area will be bigger.
+
+
+### The `output` block
+
+```yaml
+output_enabled: [out1]
+output:
+  out1:
+    type: blender_file
+    ...
+  out2: 
+    type: usd_file
+    ...
+  out3:
+    type: gazebo_model
+    ...
+  out4:
+    type: description
+    ...
+```
+
+The `output` block contains several key/value that correspond to a name that can be referenced by
+`output_enabled` and a configuration block:
+
+* `type`: the output type. Available: `blender_file`, `usd_file`, `gazebo_model` or `description`
+
+The other parameters of the output block depends of the `type`.
+
+#### Output type `blender_file`
+
+```yaml
+out1:
+  type: blender_file
+  filename: small_field.blend
+```
+
+* `filename`: file name (and optionally a relative path) of the generated blender file
+
+#### Output type `usd_file`
+
+```yaml
+out2:
+  type: usd_file
+  filename: small_field.usd
+```
+
+* `filename`: file name (and optionally a relative path) of the generated usd file. Available file extentions: `*.usd`, `*.usda`, `*.usdc` and `*.usdz`
+
+#### Output type `gazebo_model`
+
+```yaml
+out3:
+  type: gazebo_model
+  name: maize_field
+  author: John Smith
+  use_absolute_path: false
+```
+
+* `name`: name (and optionally a relative path) of the gazebo model directory to create
+* `author` (optional): a string to add in the author field of the model config file
+* `use_absolute_path` (optional, default: false): a boolean to enable/disable use of absolute path
+  for resources used in the SDF file.
+
+#### Output type `field_description`
+
+```yaml
+out4:
+  type: field_description
+  format: json
+  filename: description.json
+```
+
+* `filename`: file name (and optionally a relative path) of the generated description file
+* `format` (optional, choice: [`json`, `messagepack`, `compressed_messagepack`]): the format of the
+  description file.
+  If this option is omitted, the format will be chosen based on the extension in the `filename`.
+  The following extension are available:
+  - `.json` for the JSON format
+  - `.mpk` for the [MessagePack](https://msgpack.org/) format
+  - `.mpk.gz` for a compressed MessagePack using gzip
+  If the extension is unknown, the JSON format is selected by default.
+
+
+### The `render` block
+
+When this optional block is present, CropCraft renders a dataset of paired RGB images and semantic
+segmentation masks in a single run.
+
+```yaml
+render:
+  directory: render
+  frames: 10
+  samples: 32
+  cycles_device: GPU
+  resolution_x: 1920
+  resolution_y: 1080
+  env_path: ../assets/textures/dry_hay_field_1k.hdr
+  env_rotation_deg: 0.0
+  camera:
+    height: 1.6
+    fov_deg: 60.0
+    roll_deg: 0.0
+    pitch_deg: 0.0
+    yaw_deg: 0.0
+    y_jitter: 0.1
+  label_colors:
+    crop:       [0, 255, 0]
+    weed:       [255, 0, 0]
+    background: [0, 0, 0]
+```
+
+* `directory` (default: `render`): subdirectory (relative to `--output-dir`) where the images are
+  saved.
+  RGB images are written to `<directory>/images/` and masks to `<directory>/masks/`.
+* `frames` (default: 1): number of frames to render.
+  The camera is placed at `frames` evenly-spaced positions along a straight line following the
+  center of the bed: position 1 is at the start of the bed and position `frames` is at the end.
+  Increasing `frames` produces more images with a smaller displacement between consecutive views;
+  decreasing it produces fewer images with a larger displacement.
+* `samples` (default: 32): number of path-tracing samples per pixel used for the RGB pass
+  (Cycles engine).
+* `cycles_device` (default: `GPU`, options: `GPU`, `CPU`): compute device used by the Cycles
+  renderer for the RGB pass. Set to `CPU` if no compatible GPU is available.
+  > **Note:** when using `GPU`, the desired GPU must be enabled in Blender beforehand.
+  > Open Blender and go to **Edit > Preferences > System > Cycles Render Devices**, then select
+  > your GPU. This setting is saved in Blender's user preferences and persists across runs.
+  > (Verified on Blender 5.0.1.)
+* `resolution_x` (default: 1920, in pixels): horizontal resolution of the rendered images.
+* `resolution_y` (default: 1080, in pixels): vertical resolution of the rendered images.
+* `env_path` (optional): path to an HDR/EXR image used as the world environment lighting.
+  Relative paths are resolved from the directory containing the YAML config file.
+  When omitted, the built-in `assets/textures/dry_hay_field_1k.hdr` is used.
+* `env_rotation_deg` (default: 0.0, in degrees): rotates the environment map around the
+  vertical (Z) axis. Use this to control the direction of the sun / shadows cast by the environment
+  image without modifying the image file.
+
+#### The `camera` sub-block
+
+* `height` (default: 1.0, in meters): height of the camera above the ground plane.
+* `fov_deg` (default: 60.0, in degrees): horizontal field of view of the camera.
+* `roll_deg` (default: 0.0, in degrees): rotation of the camera around the X axis (XYZ Euler order).
+* `pitch_deg` (default: 0.0, in degrees): rotation of the camera around the Y axis (XYZ Euler order).
+* `yaw_deg` (default: 0.0, in degrees): rotation of the camera around the Z axis (XYZ Euler order).
+* `y_jitter` (default: 0.0, in meters): maximum random lateral displacement of the camera per
+  frame, drawn from a uniform distribution `[-y_jitter, +y_jitter]`.
+
+#### The `label_colors` sub-block
+
+Controls the RGB color assigned to each semantic class in the mask images.
+Each value is a list of three integers in the range `[0, 255]`.
+
+```yaml
+label_colors:
+  crop:       [0, 255, 0]   # default: green
+  weed:       [255, 0, 0]   # default: red
+  background: [0, 0, 0]     # default: black (ground and stones)
+```
+
+* `crop` (default: `[0, 255, 0]`): color for crop pixels.
+* `weed` (default: `[255, 0, 0]`): color for weed pixels.
+* `background` (default: `[0, 0, 0]`): color for ground and stone pixels.
+
+The entire sub-block is optional; omitting it keeps the defaults shown above.
