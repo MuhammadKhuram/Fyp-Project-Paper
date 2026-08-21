@@ -1,0 +1,79 @@
+output_enabled: [blender, gazebo]
+output:
+  blender:
+    type: blender_file
+    filename: bean_3weed_01.blend
+  gazebo:
+    type: gazebo_model
+    name: bean_3weed_01
+
+field:
+  headland_width: 3.0
+  random_seed: 123456789   # fixed seed so you can regenerate the exact same field
+
+  beds:
+    bed1:
+      plant_type: bean
+      plant_height: .15
+      height_tolerance_coeff: .1
+      row_distance: .75
+      rows_count: 6
+      plants_count: 60
+      plant_distance: .15
+      bed_width: 3.0
+      orientation: random
+
+  noise:
+    position: .016
+    tilt: .05
+    missing: .12
+    scale: .10
+
+  weeds:
+    portulaca:
+      plant_type: portulaca
+      max_height: 0.05
+      density: 5.
+      distance_min: 0.15
+      scattering_mode: image
+      scattering_img: ../examples/noise_pattern.png
+
+    polygonum:
+      plant_type: polygonum
+      max_height: 0.10
+      density: 4.
+      distance_min: 0.18
+      scattering_mode: image
+      scattering_img: ../examples/noise_pattern.png
+
+    taraxacum:
+      plant_type: taraxacum
+      max_height: 0.10
+      density: 3.
+      distance_min: 0.20
+      scattering_mode: image
+      scattering_img: ../examples/noise_pattern.png
+
+  stones:
+    density: 4.
+    distance_min: 0.05
+    noise_scale: 0.30
+    noise_offset: 0.15
+
+
+render: # i added render section to make datastet
+  directory: render
+  frames: 100
+  samples: 12        # 32 initially
+  camera:
+    height: 1.0      # 0.5 inittially
+    fov_deg: 60.0
+    roll_deg: 5.0    # Rotation around the camera’s viewing direction. Positive or negative values: tilted/rotated image.
+    pitch_deg: 5.0   # Upward or downward camera tilt.
+    yaw_deg: 0.0     # Positive or negative values rotate the view sideways relative to the bed.
+    y_jitter: 0.5    # 0.1 inittially
+  label_colors:
+    crop: [0, 255, 0]
+    weed: [255, 0, 0]
+    background: [0, 0, 0]
+
