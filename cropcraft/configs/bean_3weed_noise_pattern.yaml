@@ -2,10 +2,10 @@ output_enabled: [blender, gazebo]
 output:
   blender:
     type: blender_file
-    filename: bean_3weed_01.blend
+    filename: bean_3weed_noise_pattern.blend
   gazebo:
     type: gazebo_model
-    name: bean_3weed_01
+    name: bean_3weed_noise_pattern
 
 field:
   headland_width: 3.0
@@ -63,14 +63,14 @@ field:
 
 render: # i added render section to make datastet
   directory: render
-  frames: 100
+  frames: 400
   samples: 12        # 32 initially
   camera:
     height: 1.0      # 0.5 inittially
     fov_deg: 60.0
-    roll_deg: 5.0    # Rotation around the camera’s viewing direction. Positive or negative values: tilted/rotated image.
-    pitch_deg: 5.0   # Upward or downward camera tilt.
-    yaw_deg: 0.0     # Positive or negative values rotate the view sideways relative to the bed.
+    roll_deg: 10.0    # Rotation around the camera’s viewing direction. Positive or negative values: tilted/rotated image.
+    pitch_deg: 10.0   # Upward or downward camera tilt.
+    yaw_deg: 10.0     # Positive or negative values rotate the view sideways relative to the bed.
     y_jitter: 0.5    # 0.1 inittially
   label_colors:
     crop: [0, 255, 0]

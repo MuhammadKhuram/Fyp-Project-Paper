@@ -1,0 +1,77 @@
+output_enabled:
+- blender
+- gazebo
+output:
+  blender:
+    type: blender_file
+    filename: bean_field_02.blend
+  gazebo:
+    type: gazebo_model
+    name: bean_field_02
+    path: .
+field:
+  headland_width: 5.2
+  random_seed: 137869475
+  beds:
+    bed1:
+      plant_type: bean
+      plant_height: 0.206
+      height_tolerance_coeff: 0.15
+      row_distance: 0.777
+      rows_count: 6
+      plants_count: 30
+      plant_distance: 0.208
+      bed_width: 4.99
+      orientation: random
+  noise:
+    position: 0.025
+    tilt: 0.091
+    missing: 0.187
+    scale: 0.119
+  weeds:
+    taraxacum:
+      plant_type: taraxacum
+      density: 3.8
+      distance_min: 0.239
+      max_height: 0.107
+      noise_scale: 0.411
+      noise_offset: 0.168
+    polygonum:
+      plant_type: polygonum
+      density: 3.4
+      distance_min: 0.309
+      max_height: 0.089
+      noise_scale: 0.273
+      noise_offset: 0.146
+  stones:
+    density: 56.6
+    distance_min: 0.064
+    noise_scale: 0.244
+    noise_offset: 0.115
+render:
+  directory: render
+  frames: 100
+  samples: 12
+  resolution_x: 640
+  resolution_y: 480
+  env_rotation_deg: 82.5
+  camera:
+    height: 1.054
+    fov_deg: 50.0
+    roll_deg: 0.0
+    pitch_deg: 0.0
+    yaw_deg: 0.0
+    y_jitter: 0.4
+  label_colors:
+    crop:
+    - 0
+    - 255
+    - 0
+    weed:
+    - 255
+    - 0
+    - 0
+    background:
+    - 0
+    - 0
+    - 0

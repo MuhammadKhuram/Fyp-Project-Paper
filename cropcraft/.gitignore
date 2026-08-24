@@ -1,3 +1,7 @@
 __pycache__/
 *.blend1
 /.venv/
+/train
+/val
+*.zip
+"UnifiedDataset.zip"

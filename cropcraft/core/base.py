@@ -131,39 +131,28 @@ def setup_camera_animation(render: cfg_module.Render, bed_end: mathutils.Vector)
     bpy.data.collections['env'].objects.link(camera)
     scene.camera = camera
 
-    curve_data = bpy.data.curves.new('BedPath', type='CURVE')
-    curve_data.dimensions = '3D'
-    curve_data.use_path = True
-    spline = curve_data.splines.new('BEZIER')
-    spline.bezier_points.add(1)
-    center_y = bed_end.y / 2.0
-    for bp, coord in zip(spline.bezier_points, ((0.0, center_y, camera_cfg.height), (bed_end.x, center_y, camera_cfg.height))):
-        bp.co = coord
-        bp.handle_left_type = 'AUTO'
-        bp.handle_right_type = 'AUTO'
-    curve_obj = bpy.data.objects.new('BedPath', curve_data)
-    bpy.data.collections['env'].objects.link(curve_obj)
+    length = bed_end.x
+    width = bed_end.y
+    WIDTH_PASSES = 3  # how many times to sweep across the full field width over the run
 
-    constraint = camera.constraints.new(type='FOLLOW_PATH')
-    constraint.target = curve_obj
-    constraint.forward_axis = 'TRACK_NEGATIVE_Y'
-    constraint.up_axis = 'UP_Z'
-
-    curve_data.use_path_follow = True
-    curve_data.path_duration = render.frames
-    curve_data.eval_time = 0
-    curve_data.keyframe_insert(data_path='eval_time', frame=1)
-    curve_data.eval_time = render.frames
-    curve_data.keyframe_insert(data_path='eval_time', frame=render.frames)
-
+    rand = random.Random(random.getrandbits(32))
     scene.frame_start = 1
-    if camera_cfg.y_jitter != 0.0:
-        rand = random.Random(random.getrandbits(32))
-        for frame in range(render.frames):
-            jitter = rand.uniform(-camera_cfg.y_jitter, camera_cfg.y_jitter)
-            camera.location.y = jitter
-            camera.keyframe_insert(data_path='location', frame=frame, index=1)
     scene.frame_end = render.frames
+
+    for frame in range(1, render.frames + 1):
+        t = (frame - 1) / max(1, render.frames - 1)
+        x = t * length
+
+        phase = (t * WIDTH_PASSES) % 1.0
+        tri = 1 - abs(2 * phase - 1)   # triangle wave: 0 -> 1 -> 0
+        y = tri * width
+
+        if camera_cfg.y_jitter != 0.0:
+            y += rand.uniform(-camera_cfg.y_jitter, camera_cfg.y_jitter)
+            y = max(0.0, min(width, y))
+
+        camera.location = (x, y, camera_cfg.height)
+        camera.keyframe_insert(data_path='location', frame=frame)
 
 
 def _quantize_masks(masks_dir: str, label_colors: cfg_module.LabelColors):

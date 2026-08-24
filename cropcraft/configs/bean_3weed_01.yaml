@@ -15,7 +15,7 @@ field:
     bed1:
       plant_type: bean
       plant_height: .15
-      height_tolerance_coeff: .1
+      height_tolerance_coeff: .15
       row_distance: .75
       rows_count: 6
       plants_count: 60
@@ -66,9 +66,9 @@ render: # i added render section to make datastet
   camera:
     height: 1.0 # 0.5 inittially
     fov_deg: 60.0
-    roll_deg: 0.0
-    pitch_deg: 0.0
-    yaw_deg: 0.0
+    roll_deg: 10.0
+    pitch_deg: 10.0
+    yaw_deg: 10.0
     y_jitter: 0.5 # 0.1 inittially
   label_colors:
     crop: [0, 255, 0]
