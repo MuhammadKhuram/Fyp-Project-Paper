@@ -1,0 +1,280 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+
+WorldInfo {
+  contactProperties [
+    ContactProperties {
+      material1 "wheel_diag_b"
+      coulombFriction [
+        0, 2, 0
+      ]
+      frictionRotation 0.785398 0
+      bounce 0
+      forceDependentSlip [
+        10, 0
+      ]
+    }
+    ContactProperties {
+      material1 "wheel_diag_a"
+      coulombFriction [
+        0, 2, 0
+      ]
+      frictionRotation -0.785398 0
+      bounce 0
+      forceDependentSlip [
+        10, 0
+      ]
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.20946182374970712 0.0005449818771177394 0.9778166737104662 3.136517958947935
+  position 5.16459083899344 -0.026984681967513607 3.024614632716123
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 10 10
+}
+Robot {
+  translation -7.008381507191153e-05 6.494352245330319e-05 0.13524344567393629
+  rotation -0.6797006829359986 -0.7334891629980842 0.0007933351794865303 0.0006369777727543327
+  children [
+    Lidar {
+      translation 0.3 0 0.05
+      horizontalResolution 180
+      fieldOfView 3.14159
+      numberOfLayers 1
+      minRange 0.05
+      maxRange 3
+    }
+    Pose {
+      translation 0.3 0 0.11
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 1 1
+          }
+          geometry Cone {
+            bottomRadius 0.04
+            height 0.1
+          }
+        }
+      ]
+    }
+    InertialUnit {
+      name "imu"
+    }
+    Compass {
+    }
+    GPS {
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 87.54853286643223
+        axis 0 1 0
+        anchor -0.3 -0.32 -0.075
+      }
+      device [
+        PositionSensor {
+          name "wheel_rr_sensor"
+        }
+        RotationalMotor {
+          name "wheel_rr_motor"
+          maxVelocity 25
+          maxTorque 25
+        }
+      ]
+      endPoint Solid {
+        translation -0.3 -0.32 -0.075
+        rotation 0.9582162203566497 -0.202263904957882 0.20226464791605442 1.6134688701003852
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+            }
+            geometry Cylinder {
+              height 0.06
+              radius 0.075
+            }
+          }
+        ]
+        name "wheel_rr"
+        contactMaterial "wheel_diag_a"
+        boundingObject Cylinder {
+          height 0.1
+          radius 0.075
+        }
+        physics Physics {
+        }
+        linearVelocity -1.5376952065788955e-07 1.8311917726361915e-07 2.1267181132050873e-06
+        angularVelocity -3.0850685141267668e-06 -2.7671845648303505e-06 1.421367353184018e-07
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 80.64074351850729
+        axis 0 1 0
+        anchor -0.3 0.32 -0.075
+      }
+      device [
+        PositionSensor {
+          name "wheel_rl_sensor"
+        }
+        RotationalMotor {
+          name "wheel_rl_motor"
+          maxVelocity 25
+          maxTorque 25
+        }
+      ]
+      endPoint Solid {
+        translation -0.3 0.32 -0.075
+        rotation -0.7769315608293976 0.44518304876302983 -0.44518468401467953 4.462620483034322
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+            }
+            geometry Cylinder {
+              height 0.06
+              radius 0.075
+            }
+          }
+        ]
+        name "wheel_rl"
+        contactMaterial "wheel_diag_b"
+        boundingObject Cylinder {
+          height 0.1
+          radius 0.075
+        }
+        physics Physics {
+        }
+        linearVelocity -2.3467187023736905e-07 1.7089211409273122e-07 1.926915156705659e-07
+        angularVelocity -3.085922153960866e-06 -2.7651028718782494e-06 1.420978720714147e-07
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 9.188587297421824
+        axis 0 1 0
+        anchor 0.3 -0.32 -0.075
+      }
+      device [
+        PositionSensor {
+          name "wheel_fr_sensor"
+        }
+        RotationalMotor {
+          name "wheel_fr_motor"
+          maxVelocity 25
+          maxTorque 25
+        }
+      ]
+      endPoint Solid {
+        translation 0.3 -0.32 -0.075
+        rotation -0.08360283877144328 -0.7046300156173735 0.7046326038726963 3.3084097890581967
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+            }
+            geometry Cylinder {
+              height 0.06
+              radius 0.075
+            }
+          }
+        ]
+        name "wheel_fr"
+        contactMaterial "wheel_diag_b"
+        boundingObject Cylinder {
+          height 0.06
+          radius 0.075
+        }
+        physics Physics {
+        }
+        linearVelocity -1.8122378252562506e-07 2.935752144253507e-07 3.8385145095134305e-06
+        angularVelocity -3.0833404367741084e-06 -2.770280694886067e-06 1.4198605455580822e-07
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 87.89210152717592
+        axis 0 1 0
+        anchor 0.3 0.32 -0.075
+      }
+      device [
+        PositionSensor {
+          name "wheel_fl_sensor"
+        }
+        RotationalMotor {
+          name "wheel_fl_motor"
+          maxVelocity 25
+          maxTorque 25
+        }
+      ]
+      endPoint Solid {
+        translation 0.3 0.32 -0.075
+        rotation 0.9986876406701016 -0.03621454637284909 0.03621467939655029 1.572113220846937
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+            }
+            geometry Cylinder {
+              height 0.06
+              radius 0.075
+            }
+          }
+        ]
+        name "wheel_fl"
+        contactMaterial "wheel_diag_a"
+        boundingObject Cylinder {
+          height 0.1
+          radius 0.075
+        }
+        physics Physics {
+        }
+        linearVelocity -2.4726156032763785e-07 2.6562671266082907e-07 1.8191846566794235e-06
+        angularVelocity -3.085267733434491e-06 -2.7680049843625516e-06 1.4213708809867246e-07
+      }
+    }
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.2 0.2 0.8
+      }
+      geometry Box {
+        size 0.75 0.6 0.15
+      }
+    }
+  ]
+  name "mecanum_platform"
+  boundingObject Box {
+    size 0.75 0.6 0.15
+  }
+  physics Physics {
+  }
+  controller "mecanum_lidar_test"
+  linearVelocity -4.080704792221717e-07 4.5612554178735436e-07 -5.527426191191676e-08
+  angularVelocity -3.084769681437619e-06 -2.7675970817405273e-06 1.4192088457473228e-07
+}
+Solid {
+  translation 1 0 0.1
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.8 0 0
+      }
+      geometry Box {
+        size 0.1 0.5 0.5
+      }
+    }
+  ]
+  name "lidar test box"
+  boundingObject Box {
+    size 0.1 0.5 0.5
+  }
+}

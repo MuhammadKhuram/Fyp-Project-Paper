@@ -135,7 +135,7 @@ class DeltaVisualizer:
         ax.set_title("Figure 2a: 3D Reachable Workspace Envelope (limits + collision applied)")
         ax.legend()
         plt.savefig(cfg.results_path("fig2a_workspace_3d.png"), dpi=300)
-        plt.show()
+        plt.close()
 
         with open(cfg.results_path("workspace_summary.csv"), "w", newline="") as f:
             w = csv.writer(f)
@@ -153,14 +153,17 @@ class DeltaVisualizer:
         ax2.scatter(rx, rz, s=1, c=ry, alpha=0.1)
         ax2.set_title("Side View (XZ Projection)")
         plt.savefig(cfg.results_path("fig2b_workspace_projections.png"), dpi=300)
-        plt.show()
+        plt.close()
 
     def plot_path_optimization(self, weeds):
+        import itertools
+        
         def path_length(order):
             pts = [[0.0, 0.0]] + list(order) + [[0.0, 0.0]]
             return sum(np.linalg.norm(np.array(pts[i + 1]) - np.array(pts[i]))
                        for i in range(len(pts) - 1))
 
+        # Greedy nearest-neighbor path
         curr, unvisited = [0.0, 0.0], list(weeds)
         opt_path = [curr]
         while unvisited:
@@ -172,22 +175,42 @@ class DeltaVisualizer:
         rand_len = path_length(weeds)
         reduction = 100 * (1 - opt_len / rand_len)
 
+        # Exact optimal TSP path
+        home = [0.0, 0.0]
+        exact_len = float('inf')
+        exact_path = []
+        for perm in itertools.permutations(weeds):
+            tour = [home] + list(perm) + [home]
+            dist = sum(np.linalg.norm(np.array(tour[k + 1]) - np.array(tour[k]))
+                       for k in range(len(tour) - 1))
+            if dist < exact_len:
+                exact_len = dist
+                exact_path = tour
+
+        greedy_overhead = 100 * (opt_len - exact_len) / exact_len if exact_len > 0 else 0.0
+
         plt.figure(figsize=(7, 7))
         px, py = zip(*opt_path)
-        plt.plot(px, py, 'b--', label='Greedy nearest-neighbor path', alpha=0.7)
+        plt.plot(px, py, 'b--', label=f'Greedy nearest-neighbor path ({opt_len:.1f} mm)', alpha=0.8)
+        
+        ex, ey = zip(*exact_path)
+        plt.plot(ex, ey, 'g:', label=f'Exact optimal TSP tour ({exact_len:.1f} mm)', alpha=0.8)
+        
         plt.scatter(*zip(*weeds), c='red', marker='x', s=100, label='Detected weeds')
         plt.plot(0, 0, 'go', label='Home')
-        plt.title("Figure 3a: Weed-Removal Trajectory")
+        plt.title("Figure 3a: Weed-Removal Trajectory Optimization")
         plt.legend(); plt.grid(True); plt.axis('equal')
         plt.savefig(cfg.results_path("fig3a_path_optimization.png"), dpi=300)
-        plt.show()
+        plt.close()
 
         with open(cfg.results_path("path_optimization_summary.csv"), "w", newline="") as f:
             w = csv.writer(f)
             w.writerow(["metric", "value_mm_or_pct"])
             w.writerow(["greedy_path_length_mm", round(opt_len, 1)])
             w.writerow(["unsorted_path_length_mm", round(rand_len, 1)])
+            w.writerow(["exact_path_length_mm", round(exact_len, 1)])
             w.writerow(["reduction_pct", round(reduction, 1)])
+            w.writerow(["greedy_overhead_pct", round(greedy_overhead, 1)])
 
         return opt_len, rand_len
 
@@ -214,7 +237,7 @@ class DeltaVisualizer:
         plt.title("Figure 3b: Joint Angle Step Response (MG996R, simulated)")
         plt.xlabel("Time (s)"); plt.ylabel("Angle (deg)"); plt.grid(True); plt.legend()
         plt.savefig(cfg.results_path("fig3b_pid_response.png"), dpi=300)
-        plt.show()
+        plt.close()
 
         with open(cfg.results_path("pid_response_summary.csv"), "w", newline="") as f:
             w = csv.writer(f)

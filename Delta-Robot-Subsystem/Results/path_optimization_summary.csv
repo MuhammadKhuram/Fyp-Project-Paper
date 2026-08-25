@@ -1,4 +1,6 @@
 metric,value_mm_or_pct
 greedy_path_length_mm,758.2
 unsorted_path_length_mm,990.1
+exact_path_length_mm,717.8
 reduction_pct,23.4
+greedy_overhead_pct,5.6
