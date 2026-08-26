@@ -1,0 +1,77 @@
+output_enabled:
+- blender
+- gazebo
+output:
+  blender:
+    type: blender_file
+    filename: bean_field_08.blend
+  gazebo:
+    type: gazebo_model
+    name: bean_field_08
+    path: .
+field:
+  headland_width: 3.1
+  random_seed: 1587106770
+  beds:
+    bed1:
+      plant_type: bean
+      plant_height: 0.118
+      height_tolerance_coeff: 0.15
+      row_distance: 0.614
+      rows_count: 6
+      plants_count: 70
+      plant_distance: 0.359
+      bed_width: 3.81
+      orientation: zero
+  noise:
+    position: 0.013
+    tilt: 0.045
+    missing: 0.166
+    scale: 0.128
+  weeds:
+    polygonum:
+      plant_type: polygonum
+      density: 6.3
+      distance_min: 0.229
+      max_height: 0.055
+      noise_scale: 0.239
+      noise_offset: 0.165
+    portulaca:
+      plant_type: portulaca
+      density: 5.3
+      distance_min: 0.382
+      max_height: 0.142
+      noise_scale: 0.203
+      noise_offset: 0.162
+  stones:
+    density: 19.5
+    distance_min: 0.057
+    noise_scale: 0.301
+    noise_offset: 0.076
+render:
+  directory: render
+  frames: 100
+  samples: 12
+  resolution_x: 640
+  resolution_y: 480
+  env_rotation_deg: 316.5
+  camera:
+    height: 0.97
+    fov_deg: 50.0
+    roll_deg: 0.0
+    pitch_deg: 0.0
+    yaw_deg: 0.0
+    y_jitter: 0.368
+  label_colors:
+    crop:
+    - 0
+    - 255
+    - 0
+    weed:
+    - 255
+    - 0
+    - 0
+    background:
+    - 0
+    - 0
+    - 0

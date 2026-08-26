@@ -1,0 +1,70 @@
+output_enabled:
+- blender
+- gazebo
+output:
+  blender:
+    type: blender_file
+    filename: bean_field_04.blend
+  gazebo:
+    type: gazebo_model
+    name: bean_field_04
+    path: .
+field:
+  headland_width: 5.8
+  random_seed: 2436779490
+  beds:
+    bed1:
+      plant_type: bean
+      plant_height: 0.246
+      height_tolerance_coeff: 0.15
+      row_distance: 0.791
+      rows_count: 6
+      plants_count: 40
+      plant_distance: 0.363
+      bed_width: 5.0
+      orientation: random
+  noise:
+    position: 0.023
+    tilt: 0.058
+    missing: 0.164
+    scale: 0.13
+  weeds:
+    polygonum:
+      plant_type: polygonum
+      density: 6.8
+      distance_min: 0.285
+      max_height: 0.121
+      noise_scale: 0.359
+      noise_offset: 0.1
+  stones:
+    density: 15.9
+    distance_min: 0.076
+    noise_scale: 0.376
+    noise_offset: 0.216
+render:
+  directory: render
+  frames: 100
+  samples: 12
+  resolution_x: 640
+  resolution_y: 480
+  env_rotation_deg: 86.7
+  camera:
+    height: 0.962
+    fov_deg: 50.0
+    roll_deg: 0.0
+    pitch_deg: 0.0
+    yaw_deg: 0.0
+    y_jitter: 0.4
+  label_colors:
+    crop:
+    - 0
+    - 255
+    - 0
+    weed:
+    - 255
+    - 0
+    - 0
+    background:
+    - 0
+    - 0
+    - 0

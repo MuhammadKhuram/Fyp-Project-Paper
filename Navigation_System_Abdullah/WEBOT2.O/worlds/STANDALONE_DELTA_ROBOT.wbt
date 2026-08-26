@@ -1,0 +1,169 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Soil.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+
+WorldInfo {
+  contactProperties [
+    ContactProperties {
+      material1 "wheel_diag_b"
+      coulombFriction [
+        0, 2, 0
+      ]
+      frictionRotation 0.785398 0
+      bounce 0
+      forceDependentSlip [
+        10, 0
+      ]
+    }
+    ContactProperties {
+      material1 "wheel_diag_a"
+      coulombFriction [
+        0, 2, 0
+      ]
+      frictionRotation -0.785398 0
+      bounce 0
+      forceDependentSlip [
+        10, 0
+      ]
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.20946182374970712 0.0005449818771177394 0.9778166737104662 3.136517958947935
+  position 5.16459083899344 -0.026984681967513607 3.024614632716123
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 10 10
+  wallHeight 0.05
+  floorAppearance Soil {
+  }
+}
+Robot {
+  translation 0 0 0.8
+  rotation 0 0 1 0
+  controller "delta_standalone"
+  supervisor TRUE
+  children [
+    # Top Base Plate
+    Pose {
+      translation 0 0 0
+      children [
+        Shape {
+          appearance PBRAppearance { baseColor 0.1 0.1 0.1 metalness 0.8 }
+          geometry Cylinder { radius 0.22 height 0.015 }
+        }
+      ]
+    }
+    # Support Stand Legs
+    Pose {
+      translation 0.25 0.25 -0.4
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 } geometry Box { size 0.03 0.03 0.8 } } ]
+    }
+    Pose {
+      translation -0.25 0.25 -0.4
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 } geometry Box { size 0.03 0.03 0.8 } } ]
+    }
+    Pose {
+      translation 0.25 -0.25 -0.4
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 } geometry Box { size 0.03 0.03 0.8 } } ]
+    }
+    Pose {
+      translation -0.25 -0.25 -0.4
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 } geometry Box { size 0.03 0.03 0.8 } } ]
+    }
+
+    # Servo Motor Housings (3x at 120 degree angles)
+    Pose { translation 0.15 0 0.02 children [ Shape { appearance PBRAppearance { baseColor 0.1 0.3 0.8 } geometry Box { size 0.05 0.05 0.06 } } ] }
+    Pose { translation -0.075 0.1299 0.02 children [ Shape { appearance PBRAppearance { baseColor 0.1 0.3 0.8 } geometry Box { size 0.05 0.05 0.06 } } ] }
+    Pose { translation -0.075 -0.1299 0.02 children [ Shape { appearance PBRAppearance { baseColor 0.1 0.3 0.8 } geometry Box { size 0.05 0.05 0.06 } } ] }
+
+    # Active Upper Arm 1
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0.15 0 0 }
+      device [ RotationalMotor { name "motor_1" maxVelocity 6.0 maxTorque 20 } PositionSensor { name "sensor_1" } ]
+      endPoint Solid {
+        name "upper_arm_1"
+        translation 0.15 0 0
+        children [
+          Pose { translation 0.06 0 -0.02 rotation 0 1 0 0.4 children [ Shape { appearance PBRAppearance { baseColor 0.1 0.1 0.1 } geometry Cylinder { radius 0.008 height 0.12 } } ] }
+        ]
+      }
+    }
+    # Active Upper Arm 2
+    HingeJoint {
+      jointParameters HingeJointParameters { axis -0.866 -0.5 0 anchor -0.075 0.1299 0 }
+      device [ RotationalMotor { name "motor_2" maxVelocity 6.0 maxTorque 20 } PositionSensor { name "sensor_2" } ]
+      endPoint Solid {
+        name "upper_arm_2"
+        translation -0.075 0.1299 0
+        children [
+          Pose { translation -0.03 0.052 -0.02 rotation -0.866 -0.5 0 0.4 children [ Shape { appearance PBRAppearance { baseColor 0.1 0.1 0.1 } geometry Cylinder { radius 0.008 height 0.12 } } ] }
+        ]
+      }
+    }
+    # Active Upper Arm 3
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0.866 -0.5 0 anchor -0.075 -0.1299 0 }
+      device [ RotationalMotor { name "motor_3" maxVelocity 6.0 maxTorque 20 } PositionSensor { name "sensor_3" } ]
+      endPoint Solid {
+        name "upper_arm_3"
+        translation -0.075 -0.1299 0
+        children [
+          Pose { translation -0.03 -0.052 -0.02 rotation 0.866 -0.5 0 0.4 children [ Shape { appearance PBRAppearance { baseColor 0.1 0.1 0.1 } geometry Cylinder { radius 0.008 height 0.12 } } ] }
+        ]
+      }
+    }
+
+    # Moving End-Effector Platform & Sliders
+    SliderJoint {
+      jointParameters JointParameters { axis 1 0 0 minStop -0.25 maxStop 0.25 }
+      device [ LinearMotor { name "delta_x_motor" } PositionSensor { name "delta_x_sensor" } ]
+      endPoint Solid {
+        name "delta_x_link"
+        children [
+          SliderJoint {
+            jointParameters JointParameters { axis 0 1 0 minStop -0.25 maxStop 0.25 }
+            device [ LinearMotor { name "delta_y_motor" } PositionSensor { name "delta_y_sensor" } ]
+            endPoint Solid {
+              name "delta_y_link"
+              children [
+                SliderJoint {
+                  jointParameters JointParameters { axis 0 0 1 minStop -0.4 maxStop 0.0 }
+                  device [ LinearMotor { name "delta_z_motor" } PositionSensor { name "delta_z_sensor" } ]
+                  endPoint Solid {
+                    name "delta_effector"
+                    translation 0 0 -0.40
+                    children [
+                      # Moving Platform
+                      Shape { appearance PBRAppearance { baseColor 0.2 0.2 0.2 metalness 0.9 } geometry Cylinder { radius 0.045 height 0.012 } }
+                      # Cutter Blade
+                      Pose { translation 0 0 -0.01 children [ Shape { appearance PBRAppearance { baseColor 0.9 0.9 0.9 metalness 0.95 } geometry Cylinder { radius 0.035 height 0.003 } } ] }
+                      # Red Tip
+                      Pose { translation 0 0 -0.025 children [ Shape { appearance PBRAppearance { baseColor 0.9 0.1 0.1 } geometry Cone { bottomRadius 0.008 height 0.025 } } ] }
+
+                      # 6 Carbon Fiber Lower Rods
+                      Pose { translation 0.07 0.02 0.11 rotation 0 1 0 0.42 children [ Shape { appearance PBRAppearance { baseColor 0.05 0.05 0.05 } geometry Cylinder { radius 0.0035 height 0.23 } } ] }
+                      Pose { translation 0.07 -0.02 0.11 rotation 0 1 0 0.42 children [ Shape { appearance PBRAppearance { baseColor 0.05 0.05 0.05 } geometry Cylinder { radius 0.0035 height 0.23 } } ] }
+                      Pose { translation -0.035 0.06 0.11 rotation -0.866 0.5 0 0.42 children [ Shape { appearance PBRAppearance { baseColor 0.05 0.05 0.05 } geometry Cylinder { radius 0.0035 height 0.23 } } ] }
+                      Pose { translation -0.06 0.035 0.11 rotation -0.866 0.5 0 0.42 children [ Shape { appearance PBRAppearance { baseColor 0.05 0.05 0.05 } geometry Cylinder { radius 0.0035 height 0.23 } } ] }
+                      Pose { translation -0.035 -0.06 0.11 rotation 0.866 0.5 0 0.42 children [ Shape { appearance PBRAppearance { baseColor 0.05 0.05 0.05 } geometry Cylinder { radius 0.0035 height 0.23 } } ] }
+                      Pose { translation -0.06 -0.035 0.11 rotation 0.866 0.5 0 0.42 children [ Shape { appearance PBRAppearance { baseColor 0.05 0.05 0.05 } geometry Cylinder { radius 0.0035 height 0.23 } } ] }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+  name "delta_standalone"
+}

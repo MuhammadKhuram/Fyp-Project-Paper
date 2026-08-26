@@ -1,0 +1,1963 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Soil.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+
+WorldInfo {
+  contactProperties [
+    ContactProperties {
+      material1 "wheel_diag_b"
+      coulombFriction [
+        0, 2, 0
+      ]
+      frictionRotation 0.785398 0
+      bounce 0
+      forceDependentSlip [
+        10, 0
+      ]
+    }
+    ContactProperties {
+      material1 "wheel_diag_a"
+      coulombFriction [
+        0, 2, 0
+      ]
+      frictionRotation -0.785398 0
+      bounce 0
+      forceDependentSlip [
+        10, 0
+      ]
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.20946182374970712 0.0005449818771177394 0.9778166737104662 3.136517958947935
+  position 5.16459083899344 -0.026984681967513607 3.024614632716123
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 16 16
+  wallHeight 0.05
+  floorAppearance Soil {
+  }
+}
+Robot {
+  translation -5.0 -6.4 0.15
+  rotation  0 0 1 0
+  supervisor TRUE
+  children [
+    Lidar {
+      translation 0.3 0 0.05
+      horizontalResolution 180
+      fieldOfView 3.14159
+      numberOfLayers 1
+      minRange 0.05
+      maxRange 3
+    }
+    Pose {
+      translation 0.3 0 0.11
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 1 1
+          }
+          geometry Cone {
+            bottomRadius 0.04
+            height 0.1
+          }
+        }
+      ]
+    }
+    InertialUnit {
+      name "imu"
+    }
+    Compass {
+    }
+    GPS {
+    }
+    # FL STEERING ASSEMBLY
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.3 0.32 -0.05
+      }
+      device [
+        PositionSensor {
+          name "steer_fl_sensor"
+        }
+        RotationalMotor {
+          name "steer_fl_motor"
+          maxVelocity 10
+            minPosition -0.785398
+            maxPosition 0.785398
+          maxTorque 50
+        }
+      ]
+      endPoint Solid {
+        translation 0.3 0.32 -0.05
+        children [
+          # Sprocket (moves with steering)
+          Pose {
+            translation 0 0 0.47
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.25 0.25 0.25
+                  metalness 0.8
+                }
+                geometry Cylinder {
+                  radius 0.04
+                  height 0.01
+                }
+              }
+            ]
+          }
+          # Fork Stem
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.15 0.15 0.15
+            }
+            geometry Cylinder {
+              radius 0.015
+              height 0.03
+            }
+          }
+          # Fork Plate
+          Pose {
+            translation 0 0 -0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.08 0.015
+                }
+              }
+            ]
+          }
+          # Fork Left Plate
+          Pose {
+            translation 0 -0.035 -0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.01 0.06
+                }
+              }
+            ]
+          }
+          # Fork Right Plate
+          Pose {
+            translation 0 0.035 -0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.01 0.06
+                }
+              }
+            ]
+          }
+          # Drive Motor
+          Pose {
+            translation 0.04 0 0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.7 0.7 0.7
+                  metalness 0.8
+                  roughness 0.2
+                }
+                geometry Cylinder {
+                  radius 0.02
+                  height 0.05
+                }
+              }
+            ]
+          }
+          # Drive Joint
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              axis 0 1 0
+              anchor 0 0 -0.025
+            }
+            device [
+              PositionSensor {
+                name "wheel_fl_sensor"
+              }
+              RotationalMotor {
+                name "wheel_fl_motor"
+                maxVelocity 25
+                maxTorque 25
+              }
+            ]
+            endPoint Solid {
+              translation 0 0 -0.025
+              rotation 1 0 0 1.570796
+              children [
+                # Spoked Wheel
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.1 0.1 0.1
+                    roughness 0.9
+                  }
+                  geometry Cylinder {
+                    height 0.04
+                    radius 0.075
+                  }
+                }
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.4 0.4 0.4
+                    metalness 0.8
+                    roughness 0.3
+                  }
+                  geometry Cylinder {
+                    height 0.042
+                    radius 0.065
+                  }
+                }
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.3 0.3 0.3
+                    metalness 0.8
+                  }
+                  geometry Cylinder {
+                    height 0.05
+                    radius 0.015
+                  }
+                }
+                Pose {
+                  rotation 1 0 0 1.5708
+                  children [
+                    Shape {
+                      appearance PBRAppearance {
+                        baseColor 0.6 0.6 0.6
+                        metalness 0.9
+                      }
+                      geometry Cylinder {
+                        height 0.13
+                        radius 0.002
+                      }
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 0.7854
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 1.5708
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 2.3562
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+              name "wheel_fl"
+              boundingObject Cylinder {
+                height 0.04
+                radius 0.075
+              }
+              physics Physics {
+              }
+            }
+          }
+        ]
+        name "steer_fl"
+        boundingObject Cylinder {
+          radius 0.02
+          height 0.05
+        }
+        physics Physics {
+        }
+      }
+    }
+    # FR STEERING ASSEMBLY
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.3 -0.32 -0.05
+      }
+      device [
+        PositionSensor {
+          name "steer_fr_sensor"
+        }
+        RotationalMotor {
+          name "steer_fr_motor"
+          maxVelocity 10
+            minPosition -0.785398
+            maxPosition 0.785398
+          maxTorque 50
+        }
+      ]
+      endPoint Solid {
+        translation 0.3 -0.32 -0.05
+        children [
+          # Sprocket
+          Pose {
+            translation 0 0 0.47
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.25 0.25 0.25
+                  metalness 0.8
+                }
+                geometry Cylinder {
+                  radius 0.04
+                  height 0.01
+                }
+              }
+            ]
+          }
+          # Fork Stem
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.15 0.15 0.15
+            }
+            geometry Cylinder {
+              radius 0.015
+              height 0.03
+            }
+          }
+          # Fork Plate
+          Pose {
+            translation 0 0 -0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.08 0.015
+                }
+              }
+            ]
+          }
+          # Fork Left Plate
+          Pose {
+            translation 0 -0.035 -0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.01 0.06
+                }
+              }
+            ]
+          }
+          # Fork Right Plate
+          Pose {
+            translation 0 0.035 -0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.01 0.06
+                }
+              }
+            ]
+          }
+          # Drive Motor
+          Pose {
+            translation 0.04 0 0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.7 0.7 0.7
+                  metalness 0.8
+                  roughness 0.2
+                }
+                geometry Cylinder {
+                  radius 0.02
+                  height 0.05
+                }
+              }
+            ]
+          }
+          # Drive Joint
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              axis 0 1 0
+              anchor 0 0 -0.025
+            }
+            device [
+              PositionSensor {
+                name "wheel_fr_sensor"
+              }
+              RotationalMotor {
+                name "wheel_fr_motor"
+                maxVelocity 25
+                maxTorque 25
+              }
+            ]
+            endPoint Solid {
+              translation 0 0 -0.025
+              rotation 1 0 0 1.570796
+              children [
+                # Spoked Wheel
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.1 0.1 0.1
+                    roughness 0.9
+                  }
+                  geometry Cylinder {
+                    height 0.04
+                    radius 0.075
+                  }
+                }
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.4 0.4 0.4
+                    metalness 0.8
+                    roughness 0.3
+                  }
+                  geometry Cylinder {
+                    height 0.042
+                    radius 0.065
+                  }
+                }
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.3 0.3 0.3
+                    metalness 0.8
+                  }
+                  geometry Cylinder {
+                    height 0.05
+                    radius 0.015
+                  }
+                }
+                Pose {
+                  rotation 1 0 0 1.5708
+                  children [
+                    Shape {
+                      appearance PBRAppearance {
+                        baseColor 0.6 0.6 0.6
+                        metalness 0.9
+                      }
+                      geometry Cylinder {
+                        height 0.13
+                        radius 0.002
+                      }
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 0.7854
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 1.5708
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 2.3562
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+              name "wheel_fr"
+              boundingObject Cylinder {
+                height 0.04
+                radius 0.075
+              }
+              physics Physics {
+              }
+            }
+          }
+        ]
+        name "steer_fr"
+        boundingObject Cylinder {
+          radius 0.02
+          height 0.05
+        }
+        physics Physics {
+        }
+      }
+    }
+    # RL STEERING ASSEMBLY
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor -0.3 0.32 -0.05
+      }
+      device [
+        PositionSensor {
+          name "steer_rl_sensor"
+        }
+        RotationalMotor {
+          name "steer_rl_motor"
+          maxVelocity 10
+            minPosition 0.0
+            maxPosition 0.0
+          maxTorque 50
+        }
+      ]
+      endPoint Solid {
+        translation -0.3 0.32 -0.05
+        children [
+          # Sprocket
+          Pose {
+            translation 0 0 0.47
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.25 0.25 0.25
+                  metalness 0.8
+                }
+                geometry Cylinder {
+                  radius 0.04
+                  height 0.01
+                }
+              }
+            ]
+          }
+          # Fork Stem
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.15 0.15 0.15
+            }
+            geometry Cylinder {
+              radius 0.015
+              height 0.03
+            }
+          }
+          # Fork Plate
+          Pose {
+            translation 0 0 -0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.08 0.015
+                }
+              }
+            ]
+          }
+          # Fork Left Plate
+          Pose {
+            translation 0 -0.035 -0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.01 0.06
+                }
+              }
+            ]
+          }
+          # Fork Right Plate
+          Pose {
+            translation 0 0.035 -0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.01 0.06
+                }
+              }
+            ]
+          }
+          # Drive Motor
+          Pose {
+            translation -0.04 0 0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.7 0.7 0.7
+                  metalness 0.8
+                  roughness 0.2
+                }
+                geometry Cylinder {
+                  radius 0.02
+                  height 0.05
+                }
+              }
+            ]
+          }
+          # Drive Joint
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              axis 0 1 0
+              anchor 0 0 -0.025
+            }
+            device [
+              PositionSensor {
+                name "wheel_rl_sensor"
+              }
+              RotationalMotor {
+                name "wheel_rl_motor"
+                maxVelocity 25
+                maxTorque 25
+              }
+            ]
+            endPoint Solid {
+              translation 0 0 -0.025
+              rotation 1 0 0 1.570796
+              children [
+                # Spoked Wheel
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.1 0.1 0.1
+                    roughness 0.9
+                  }
+                  geometry Cylinder {
+                    height 0.04
+                    radius 0.075
+                  }
+                }
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.4 0.4 0.4
+                    metalness 0.8
+                    roughness 0.3
+                  }
+                  geometry Cylinder {
+                    height 0.042
+                    radius 0.065
+                  }
+                }
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.3 0.3 0.3
+                    metalness 0.8
+                  }
+                  geometry Cylinder {
+                    height 0.05
+                    radius 0.015
+                  }
+                }
+                Pose {
+                  rotation 1 0 0 1.5708
+                  children [
+                    Shape {
+                      appearance PBRAppearance {
+                        baseColor 0.6 0.6 0.6
+                        metalness 0.9
+                      }
+                      geometry Cylinder {
+                        height 0.13
+                        radius 0.002
+                      }
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 0.7854
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 1.5708
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 2.3562
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+              name "wheel_rl"
+              boundingObject Cylinder {
+                height 0.04
+                radius 0.075
+              }
+              physics Physics {
+              }
+            }
+          }
+        ]
+        name "steer_rl"
+        boundingObject Cylinder {
+          radius 0.02
+          height 0.05
+        }
+        physics Physics {
+        }
+      }
+    }
+    # RR STEERING ASSEMBLY
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor -0.3 -0.32 -0.05
+      }
+      device [
+        PositionSensor {
+          name "steer_rr_sensor"
+        }
+        RotationalMotor {
+          name "steer_rr_motor"
+          maxVelocity 10
+            minPosition 0.0
+            maxPosition 0.0
+          maxTorque 50
+        }
+      ]
+      endPoint Solid {
+        translation -0.3 -0.32 -0.05
+        children [
+          # Sprocket
+          Pose {
+            translation 0 0 0.47
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.25 0.25 0.25
+                  metalness 0.8
+                }
+                geometry Cylinder {
+                  radius 0.04
+                  height 0.01
+                }
+              }
+            ]
+          }
+          # Fork Stem
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.15 0.15 0.15
+            }
+            geometry Cylinder {
+              radius 0.015
+              height 0.03
+            }
+          }
+          # Fork Plate
+          Pose {
+            translation 0 0 -0.02
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.08 0.015
+                }
+              }
+            ]
+          }
+          # Fork Left Plate
+          Pose {
+            translation 0 -0.035 -0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.01 0.06
+                }
+              }
+            ]
+          }
+          # Fork Right Plate
+          Pose {
+            translation 0 0.035 -0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.15 0.15 0.15
+                }
+                geometry Box {
+                  size 0.04 0.01 0.06
+                }
+              }
+            ]
+          }
+          # Drive Motor
+          Pose {
+            translation -0.04 0 0.03
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.7 0.7 0.7
+                  metalness 0.8
+                  roughness 0.2
+                }
+                geometry Cylinder {
+                  radius 0.02
+                  height 0.05
+                }
+              }
+            ]
+          }
+          # Drive Joint
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              axis 0 1 0
+              anchor 0 0 -0.025
+            }
+            device [
+              PositionSensor {
+                name "wheel_rr_sensor"
+              }
+              RotationalMotor {
+                name "wheel_rr_motor"
+                maxVelocity 25
+                maxTorque 25
+              }
+            ]
+            endPoint Solid {
+              translation 0 0 -0.025
+              rotation 1 0 0 1.570796
+              children [
+                # Spoked Wheel
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.1 0.1 0.1
+                    roughness 0.9
+                  }
+                  geometry Cylinder {
+                    height 0.04
+                    radius 0.075
+                  }
+                }
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.4 0.4 0.4
+                    metalness 0.8
+                    roughness 0.3
+                  }
+                  geometry Cylinder {
+                    height 0.042
+                    radius 0.065
+                  }
+                }
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.3 0.3 0.3
+                    metalness 0.8
+                  }
+                  geometry Cylinder {
+                    height 0.05
+                    radius 0.015
+                  }
+                }
+                Pose {
+                  rotation 1 0 0 1.5708
+                  children [
+                    Shape {
+                      appearance PBRAppearance {
+                        baseColor 0.6 0.6 0.6
+                        metalness 0.9
+                      }
+                      geometry Cylinder {
+                        height 0.13
+                        radius 0.002
+                      }
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 0.7854
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 1.5708
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+                Pose {
+                  rotation 0 1 0 2.3562
+                  children [
+                    Pose {
+                      rotation 1 0 0 1.5708
+                      children [
+                        Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.6 0.6 0.6
+                            metalness 0.9
+                          }
+                          geometry Cylinder {
+                            height 0.13
+                            radius 0.002
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+              name "wheel_rr"
+              boundingObject Cylinder {
+                height 0.04
+                radius 0.075
+              }
+              physics Physics {
+              }
+            }
+          }
+        ]
+        name "steer_rr"
+        boundingObject Cylinder {
+          radius 0.02
+          height 0.05
+        }
+        physics Physics {
+        }
+      }
+    }
+    # TOP GANTRY FRAME
+    # Longitudinal left bar
+    Pose {
+      translation 0 0.32 0.4
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.8 0.04 0.04
+          }
+        }
+      ]
+    }
+    # Longitudinal right bar
+    Pose {
+      translation 0 -0.32 0.4
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.8 0.04 0.04
+          }
+        }
+      ]
+    }
+    # Front crossbar
+    Pose {
+      translation 0.38 0 0.4
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.04 0.6 0.04
+          }
+        }
+      ]
+    }
+    # Middle crossbar
+    Pose {
+      translation 0 0 0.4
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.04 0.6 0.04
+          }
+        }
+      ]
+    }
+    # Back crossbar
+    Pose {
+      translation -0.38 0 0.4
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.04 0.6 0.04
+          }
+        }
+      ]
+    }
+    # Corner braces
+    Pose {
+      translation 0.25 0.27 0.4
+      rotation 0 0 1 0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.1 0.03 0.03
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.25 -0.27 0.4
+      rotation 0 0 1 -0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.1 0.03 0.03
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.25 0.27 0.4
+      rotation 0 0 1 -0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.1 0.03 0.03
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.25 -0.27 0.4
+      rotation 0 0 1 0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.1 0.03 0.03
+          }
+        }
+      ]
+    }
+    # LEGS
+    # Front-Right leg
+    Pose {
+      translation 0.3 -0.32 0.175
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.04 0.04 0.45
+          }
+        }
+      ]
+    }
+    # Front-Left leg
+    Pose {
+      translation 0.3 0.32 0.175
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.04 0.04 0.45
+          }
+        }
+      ]
+    }
+    # Rear-Right leg
+    Pose {
+      translation -0.3 -0.32 0.175
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.04 0.04 0.45
+          }
+        }
+      ]
+    }
+    # Rear-Left leg
+    Pose {
+      translation -0.3 0.32 0.175
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+            roughness 0.5
+          }
+          geometry Box {
+            size 0.04 0.04 0.45
+          }
+        }
+      ]
+    }
+    # V-BRACES FOR LEGS
+    # FR Leg braces
+    Pose {
+      translation 0.3 -0.22 0.3
+      rotation 1 0 0 -0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.02 0.02 0.2
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.2 -0.32 0.3
+      rotation 0 1 0 0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.2 0.02 0.02
+          }
+        }
+      ]
+    }
+    # FL Leg braces
+    Pose {
+      translation 0.3 0.22 0.3
+      rotation 1 0 0 0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.02 0.02 0.2
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.2 0.32 0.3
+      rotation 0 1 0 0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.2 0.02 0.02
+          }
+        }
+      ]
+    }
+    # RR Leg braces
+    Pose {
+      translation -0.3 -0.22 0.3
+      rotation 1 0 0 -0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.02 0.02 0.2
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.2 -0.32 0.3
+      rotation 0 1 0 -0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.2 0.02 0.02
+          }
+        }
+      ]
+    }
+    # RL Leg braces
+    Pose {
+      translation -0.3 0.22 0.3
+      rotation 1 0 0 0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.02 0.02 0.2
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.2 0.32 0.3
+      rotation 0 1 0 -0.7854
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.2 0.02 0.02
+          }
+        }
+      ]
+    }
+    # STEERING RIG (TOP FRAME MECHANISM - STATIC PARTS)
+    # Central steering motor
+    Pose {
+      translation 0 0 0.43
+      rotation 1 0 0 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.7 0.7 0.7
+            metalness 0.8
+            roughness 0.2
+          }
+          geometry Cylinder {
+            radius 0.03
+            height 0.08
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0 0 0.41
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Box {
+            size 0.08 0.08 0.04
+          }
+        }
+      ]
+    }
+    # Chain loop representation
+    Pose {
+      translation 0 0.32 0.42
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.1 0.1 0.1
+          }
+          geometry Box {
+            size 0.6 0.01 0.005
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0 -0.32 0.42
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.1 0.1 0.1
+          }
+          geometry Box {
+            size 0.6 0.01 0.005
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.3 0 0.42
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.1 0.1 0.1
+          }
+          geometry Box {
+            size 0.01 0.64 0.005
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.3 0 0.42
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.1 0.1 0.1
+          }
+          geometry Box {
+            size 0.01 0.64 0.005
+          }
+        }
+      ]
+    }
+    # LIDAR MOUNT mast
+    Pose {
+      translation 0.3 0 0.225
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.15 0.15 0.15
+          }
+          geometry Cylinder {
+            radius 0.008
+            height 0.3
+          }
+        }
+      ]
+    }
+  ]
+  name "mecanum_platform"
+  boundingObject Group {
+    children [
+      Pose {
+        translation 0 0 0.4
+        children [
+          Box {
+            size 0.8 0.68 0.04
+          }
+        ]
+      }
+      Pose {
+        translation 0.3 -0.32 0.175
+        children [
+          Box {
+            size 0.04 0.04 0.45
+          }
+        ]
+      }
+      Pose {
+        translation 0.3 0.32 0.175
+        children [
+          Box {
+            size 0.04 0.04 0.45
+          }
+        ]
+      }
+      Pose {
+        translation -0.3 -0.32 0.175
+        children [
+          Box {
+            size 0.04 0.04 0.45
+          }
+        ]
+      }
+      Pose {
+        translation -0.3 0.32 0.175
+        children [
+          Box {
+            size 0.04 0.04 0.45
+          }
+        ]
+      }
+    ]
+  }
+  physics Physics {
+  }
+  controller "ackermann_steering_controller"
+  linearVelocity -4.080704792221717e-07 4.5612554178735436e-07 -5.527426191191676e-08
+  angularVelocity -3.084769681437619e-06 -2.7675970817405273e-06 1.4192088457473228e-07
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# VISUAL 9 CROP ROW LINES (Green Crop Vegetation Strips)
+
+Solid {
+  translation 0 -6.40 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_1"
+}
+
+Solid {
+  translation 0 -4.80 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_2"
+}
+
+Solid {
+  translation 0 -3.20 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_3"
+}
+
+Solid {
+  translation 0 -1.60 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_4"
+}
+
+Solid {
+  translation 0 0.00 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_5"
+}
+
+Solid {
+  translation 0 1.60 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_6"
+}
+
+Solid {
+  translation 0 3.20 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_7"
+}
+
+Solid {
+  translation 0 4.80 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_8"
+}
+
+Solid {
+  translation 0 6.40 0.0015
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.15 0.55 0.15
+        roughness 0.8
+        metalness 0.0
+      }
+      geometry Box {
+        size 10.0 0.18 0.002
+      }
+    }
+  ]
+  name "crop_row_line_9"
+}
+
+# VISUAL HEADLAND STRIPS (Dark Packed Soil: RGB 0.32 0.20 0.12)
+Solid {
+  translation 6.75 0 0.001
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.32 0.20 0.12
+        roughness 0.95
+        metalness 0.0
+      }
+      geometry Box {
+        size 2.5 16.0 0.002
+      }
+    }
+  ]
+  name "east_headland_strip"
+}
+Solid {
+  translation -6.75 0 0.001
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.32 0.20 0.12
+        roughness 0.95
+        metalness 0.0
+      }
+      geometry Box {
+        size 2.5 16.0 0.002
+      }
+    }
+  ]
+  name "west_headland_strip"
+}
+
+# PHYSICAL FIELD BOUNDARY WALLS (16m x 16m Perimeter at ±8.0m)
+Solid {
+  translation 0 8.0 0.20
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.55 0.30 0.15
+        roughness 0.8
+      }
+      geometry Box {
+        size 16.2 0.15 0.40
+      }
+    }
+  ]
+  name "north_boundary_wall"
+  boundingObject Box {
+    size 16.2 0.15 0.40
+  }
+}
+Solid {
+  translation 0 -8.0 0.20
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.55 0.30 0.15
+        roughness 0.8
+      }
+      geometry Box {
+        size 16.2 0.15 0.40
+      }
+    }
+  ]
+  name "south_boundary_wall"
+  boundingObject Box {
+    size 16.2 0.15 0.40
+  }
+}
+Solid {
+  translation 8.0 0 0.20
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.55 0.30 0.15
+        roughness 0.8
+      }
+      geometry Box {
+        size 0.15 16.2 0.40
+      }
+    }
+  ]
+  name "east_boundary_wall"
+  boundingObject Box {
+    size 0.15 16.2 0.40
+  }
+}
+Solid {
+  translation -8.0 0 0.20
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.55 0.30 0.15
+        roughness 0.8
+      }
+      geometry Box {
+        size 0.15 16.2 0.40
+      }
+    }
+  ]
+  name "west_boundary_wall"
+  boundingObject Box {
+    size 0.15 16.2 0.40
+  }
+}
