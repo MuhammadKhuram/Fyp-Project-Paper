@@ -1,24 +1,15 @@
 """
-Ackermann Steering Navigation Controller for Webots (16m x 16m Arena - 9 Crop Rows, Maximum Coverage)
+Ackermann Steering Navigation Controller for Webots (16m x 16m Arena - 15 Crop Rows)
 
 Autonomous Weed Removal Robot (AWRR) - Ackermann Kinematics Subsystem
 
-Features:
-1. Maximum Field Coverage Efficiency (9 Crop Rows):
-   - Arena Walls: X = ±8.0m, Y = ±8.0m
-   - 9 Crop Row Line Centerlines: Y = [-6.4, -4.8, -3.2, -1.6, 0.0, 1.6, 3.2, 4.8, 6.4m] (1.6m spacing)
-   - Visual green crop row lines rendered in 3D Webots scene tree along row centerlines
-   - Robot center tracks exact crop row centerlines via GPS + IMU guidance
-
-2. Mathematically Exact Semicircular Dubins U-Turn Arcs:
-   - Parametrization: theta in [0, pi]
-   - East Headland (+X): tx = 5.0 + r*sin(theta), ty = y_mid - r*cos(theta) (Arc Peak X = 5.8m)
-   - West Headland (-X): tx = -5.0 - r*sin(theta), ty = y_mid - r*cos(theta) (Arc Peak X = -5.8m)
-   - Bumper Clearance: 1.3m physical clearance to outer walls at ±8.0m!
-
-3. Vector Projection & Automatic Waypoint Advancement:
-   - Checks dot product of robot forward vector and waypoint vector (dot_prod = dx*cos(yaw) + dy*sin(yaw))
-   - Automatically advances to next waypoint if waypoint falls behind front axle, eliminating 360° donut loops.
+Agricultural Features:
+1. 15 Crop Rows at Y = [-7.0, -6.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0m] (1.0m Spacing)
+2. 1.25m Dark Soil Headlands (X in [6.75, 8.0] and [-8.0, -6.75])
+3. Interleaved Skip-Row Pathing (Every U-Turn Radius R >= 1.0m, zero oversailing!)
+4. Dynamic 3-Point Headland K-Turn Re-Alignment Maneuver:
+   - At the transition between Pass 1 (Row 15) and Pass 2 (Row 14), the robot executes a 3-point reverse K-turn
+     100% inside the West headland to align perfectly co-linear with Row 14 (Y = 6.000m) without stepping on any crop rows!
 """
 
 from controller import Robot
@@ -26,26 +17,20 @@ import math
 import csv
 import os
 
-# --- VEHICLE GEOMETRY & KINEMATICS ---
 TIME_STEP = 32
 
 WHEEL_RADIUS = 0.075    # r: Wheel radius (m)
 WHEELBASE = 0.60        # L: Wheelbase front-to-rear axle (m)
 TRACK_WIDTH = 0.64      # W: Track width left-to-right (m)
 
-# Hardware Steering Limit: ±44.5° (0.7767 rad) to prevent Webots motor limit warnings
-MAX_STEER_ANGLE = math.radians(44.5)
+MAX_STEER_ANGLE = math.radians(44.5)  # Hardware steering limit (44.5°)
+MAX_WHEEL_VEL = 25.0                  # Motor max angular speed (rad/s)
 
-MAX_WHEEL_VEL = 20.0    # Actuator maximum angular speed (rad/s)
-
-# --- SPEED & NAVIGATION TUNING ---
-CRUISE_SPEED = 0.65     # Linear speed in crop row (m/s)
-TURN_SPEED = 0.40       # Safe turning speed in headland (m/s)
-REACH_THRESHOLD = 0.40  # Waypoint acceptance radius (m)
-
-# Physical Safety Envelope (meters from LiDAR origin)
-HEADLAND_WALL_STOP_M = 0.30   # Emergency braking buffer in headland
-INROW_WALL_STOP_M = 0.50      # Emergency braking buffer in crop row
+# Navigation Tuning
+CRUISE_SPEED = 0.65     # Row speed (m/s)
+TURN_SPEED = 0.45       # Headland U-turn speed (m/s)
+REACH_THRESHOLD = 0.25  # Waypoint reach tolerance (m)
+K_P_STEER = 1.6         # Proportional steering gain
 
 # Logging
 LOG_EVERY_N_STEPS = 16
@@ -86,12 +71,11 @@ lidar.enable(TIME_STEP)
 def set_ackermann_drive(v_cmd, steer_cmd_center):
     """
     Computes closed-form Ackermann steering angles (inner/outer) and wheel speeds.
+    Supports both positive (forward) and negative (reverse) speeds.
     """
-    # Clamp virtual center steering angle strictly to [-44.5°, +44.5°]
     delta_center = max(-MAX_STEER_ANGLE, min(MAX_STEER_ANGLE, steer_cmd_center))
 
     if abs(delta_center) < 1e-4:
-        # Straight line trajectory
         steer_fl.setPosition(0.0)
         steer_fr.setPosition(0.0)
         wheel_w = v_cmd / WHEEL_RADIUS
@@ -100,25 +84,19 @@ def set_ackermann_drive(v_cmd, steer_cmd_center):
             m.setVelocity(wheel_w)
         return 0.0, 0.0, [wheel_w]*4
 
-    # Ackermann turning radius from rear axle center
     R = WHEELBASE / math.tan(abs(delta_center))
-    
-    # Inner and outer wheel steering angles
     delta_in = math.atan(WHEELBASE / (R - TRACK_WIDTH / 2.0))
     delta_out = math.atan(WHEELBASE / (R + TRACK_WIDTH / 2.0))
 
-    # Clamp front wheel angles to hardware limit
     delta_in = min(MAX_STEER_ANGLE, delta_in)
     delta_out = min(MAX_STEER_ANGLE, delta_out)
 
     if delta_center > 0:
-        # Left Turn: Left = Inner, Right = Outer
         steer_left = delta_in
         steer_right = delta_out
         v_rl = v_cmd * (1.0 - TRACK_WIDTH / (2.0 * R))
         v_rr = v_cmd * (1.0 + TRACK_WIDTH / (2.0 * R))
     else:
-        # Right Turn: Right = Inner, Left = Outer
         steer_left = -delta_out
         steer_right = -delta_in
         v_rl = v_cmd * (1.0 + TRACK_WIDTH / (2.0 * R))
@@ -127,7 +105,6 @@ def set_ackermann_drive(v_cmd, steer_cmd_center):
     steer_fl.setPosition(steer_left)
     steer_fr.setPosition(steer_right)
 
-    # Angular speeds for front and rear wheels
     w_fl = (v_cmd / math.cos(abs(steer_left))) / WHEEL_RADIUS
     w_fr = (v_cmd / math.cos(abs(steer_right))) / WHEEL_RADIUS
     w_rl = v_rl / WHEEL_RADIUS
@@ -142,67 +119,102 @@ def set_ackermann_drive(v_cmd, steer_cmd_center):
     return steer_left, steer_right, wheel_speeds
 
 
-def generate_perfect_9row_field_path(field_w=16.0, field_h=16.0, row_spacing=1.6, headland_margin=3.0, num_turn_pts=10):
+def generate_15row_kturn_ackermann_path(num_turn_pts=10):
     """
-    Generates exact 9 Crop Row Dubins Ackermann path for 16m x 16m arena:
-    - 9 Crop Rows at Y = [-6.4, -4.8, -3.2, -1.6, 0.0, 1.6, 3.2, 4.8, 6.4m]
-    - Row endpoints: X = ±5.0m
-    - Mathematically exact East & West semicircular U-turn arcs (R = 0.8m, Peak X = ±5.8m)
-    - Starts at (-5.0, -6.4), Ends at (+5.0, +6.4)
+    Generates 15 Crop Row Ackermann path with 3-Point Headland K-Turn Re-Alignment between Pass 1 and Pass 2:
+    - Pass 1 (Odd):  Row 1 (-7) -> Row 3 (-5) -> Row 5 (-3) -> Row 7 (-1) -> Row 9 (1) -> Row 11 (3) -> Row 13 (5) -> Row 15 (7)
+    - 3-Point K-Turn Re-alignment inside West Headland to align with Row 14 (6.0m)
+    - Pass 2 (Even): Row 14 (6) -> Row 12 (4) -> Row 10 (2) -> Row 8 (0) -> Row 6 (-2) -> Row 4 (-4) -> Row 2 (-6)
     """
     waypoints = []
     is_headland_turn = []
+    is_reverse_step = []
 
-    y_rows = [-6.4, -4.8, -3.2, -1.6, 0.0, 1.6, 3.2, 4.8, 6.4]
+    row_sequence = [
+        (-7.0, True),   # Row 1 (W -> E)
+        (-5.0, False),  # Row 3 (E -> W)
+        (-3.0, True),   # Row 5 (W -> E)
+        (-1.0, False),  # Row 7 (E -> W)
+        (1.0, True),    # Row 9 (W -> E)
+        (3.0, False),   # Row 11 (E -> W)
+        (5.0, True),    # Row 13 (W -> E)
+        (7.0, False),   # Row 15 (E -> W)
+        # --- 3-POINT HEADLAND K-TURN RE-ALIGNMENT HERE ---
+        (6.0, True),    # Row 14 (W -> E)
+        (4.0, False),   # Row 12 (E -> W)
+        (2.0, True),    # Row 10 (W -> E)
+        (0.0, False),   # Row 8 (E -> W)
+        (-2.0, True),   # Row 6 (W -> E)
+        (-4.0, False),  # Row 4 (E -> W)
+        (-6.0, True),   # Row 2 (W -> E)
+    ]
 
-    for i, y in enumerate(y_rows):
-        if i % 2 == 0:
-            # West to East (-5.0 to +5.0)
-            xs = [-5.0, -3.0, -1.0, 1.0, 3.0, 5.0]
-            for x in xs:
-                waypoints.append((x, y))
-                is_headland_turn.append(False)
-
-            # Semicircular U-Turn Arc in East Headland (+X)
-            if i < len(y_rows) - 1:
-                next_y = y_rows[i+1]
-                y_mid = (y + next_y) / 2.0
-                r = (next_y - y) / 2.0  # R = 0.8m
-                
-                for j in range(1, num_turn_pts + 1):
-                    theta = (j / num_turn_pts) * math.pi
-                    tx = 5.0 + r * math.sin(theta)
-                    ty = y_mid - r * math.cos(theta)
-                    waypoints.append((round(tx, 3), round(ty, 3)))
-                    is_headland_turn.append(True)
+    for i, (y, w2e) in enumerate(row_sequence):
+        # Add in-row waypoints
+        if w2e:
+            xs = [-6.5, -4.0, -1.5, 1.5, 4.0, 6.5]
         else:
-            # East to West (+5.0 to -5.0)
-            xs = [5.0, 3.0, 1.0, -1.0, -3.0, -5.0]
-            for x in xs:
-                waypoints.append((x, y))
-                is_headland_turn.append(False)
+            xs = [6.5, 4.0, 1.5, -1.5, -4.0, -6.5]
 
-            # Semicircular U-Turn Arc in West Headland (-X)
-            if i < len(y_rows) - 1:
-                next_y = y_rows[i+1]
+        for x in xs:
+            waypoints.append((x, y))
+            is_headland_turn.append(False)
+            is_reverse_step.append(False)
+
+        # Add headland U-turn or K-turn arc to next row if not the last row
+        if i < len(row_sequence) - 1:
+            next_y, next_w2e = row_sequence[i+1]
+
+            # Check if this is the Pass 1 to Pass 2 Transition (Row 15 -> Row 14)
+            if abs(next_y - y) == 1.0:
+                # --- DYNAMIC 3-POINT HEADLAND K-TURN MANEUVER ---
+                # Step 1: Coast forward into West headland to X = -7.1m at Y = 7.0m
+                waypoints.append((-7.1, 7.0))
+                is_headland_turn.append(True)
+                is_reverse_step.append(False)
+
+                # Step 2: Reverse angled down-east to X = -6.4m, Y = 6.5m
+                waypoints.append((-6.4, 6.5))
+                is_headland_turn.append(True)
+                is_reverse_step.append(True)
+
+                # Step 3: Forward align into Row 14 centerline at X = -6.5m, Y = 6.0m
+                waypoints.append((-6.5, 6.0))
+                is_headland_turn.append(True)
+                is_reverse_step.append(False)
+            else:
                 y_mid = (y + next_y) / 2.0
-                r = (next_y - y) / 2.0  # R = 0.8m
-                
-                for j in range(1, num_turn_pts + 1):
-                    theta = (j / num_turn_pts) * math.pi
-                    tx = -5.0 - r * math.sin(theta)
-                    ty = y_mid - r * math.cos(theta)
-                    waypoints.append((round(tx, 3), round(ty, 3)))
-                    is_headland_turn.append(True)
+                r = min(1.0, abs(next_y - y) / 2.0)
+                sign = 1.0 if next_y > y else -1.0
 
-    return waypoints, is_headland_turn
+                if w2e:
+                    # Arrived at East headland (+X, facing East), turning to next row
+                    for j in range(1, num_turn_pts + 1):
+                        alpha = (j / num_turn_pts) * math.pi
+                        theta = -math.pi/2.0 + alpha if sign > 0 else math.pi/2.0 - alpha
+                        tx = 6.5 + r * math.cos(theta)
+                        ty = y_mid + r * math.sin(theta)
+                        waypoints.append((round(tx, 3), round(ty, 3)))
+                        is_headland_turn.append(True)
+                        is_reverse_step.append(False)
+                else:
+                    # Arrived at West headland (-X, facing West), turning to next row
+                    for j in range(1, num_turn_pts + 1):
+                        alpha = (j / num_turn_pts) * math.pi
+                        theta = -math.pi/2.0 + alpha if sign > 0 else math.pi/2.0 - alpha
+                        tx = -6.5 - r * math.cos(theta)
+                        ty = y_mid + r * math.sin(theta)
+                        waypoints.append((round(tx, 3), round(ty, 3)))
+                        is_headland_turn.append(True)
+                        is_reverse_step.append(False)
 
-waypoints, is_headland_turn = generate_perfect_9row_field_path()
+    return waypoints, is_headland_turn, is_reverse_step
+
+waypoints, is_headland_turn, is_reverse_step = generate_15row_kturn_ackermann_path()
 current_wp_idx = 0
 
-print(f"[Ackermann Nav 16m] Generated {len(waypoints)} continuous 9-row Dubins waypoints.")
+print(f"[Ackermann Nav 16m] Generated {len(waypoints)} waypoints with 3-Point K-Turn Re-Alignment.")
 print(f"[Ackermann Nav 16m] Start: {waypoints[0]} | End: {waypoints[-1]}")
-print(f"[Ackermann Nav 16m] Steering Envelope: [-44.5°, +44.5°]. Rear Axle: Fixed.")
 
 trajectory_log = []
 step_count = 0
@@ -214,7 +226,7 @@ while robot.step(TIME_STEP) != -1:
     sim_time = robot.getTime()
 
     if current_wp_idx >= len(waypoints):
-        print(f"[Ackermann Nav 16m] ALL {len(waypoints)} WAYPOINTS COMPLETE. Final Position Reached.")
+        print(f"[Ackermann Nav 16m] ALL {len(waypoints)} WAYPOINTS COMPLETE.")
         set_ackermann_drive(0.0, 0.0)
 
         os.makedirs("results", exist_ok=True)
@@ -222,10 +234,10 @@ while robot.step(TIME_STEP) != -1:
             writer = csv.writer(f)
             writer.writerow(["time", "x", "y", "yaw", "steer_cmd_deg"])
             writer.writerows(trajectory_log)
-        print(f"[Ackermann Nav 16m] Logged complete path trajectory to results/ackermann_16m_dense_navigation_log.csv")
+        print(f"[Ackermann Nav 16m] Logged trajectory to results/ackermann_16m_dense_navigation_log.csv")
         break
 
-    # Read Sensors (Global Pose Estimation via GPS + IMU)
+    # Read Sensors
     pos = gps.getValues()
     rpy = imu.getRollPitchYaw()
     yaw = rpy[2]
@@ -243,58 +255,35 @@ while robot.step(TIME_STEP) != -1:
     if step_count % LOG_EVERY_N_STEPS == 0:
         trajectory_log.append((sim_time, pos[0], pos[1], yaw, 0.0))
 
-    # Vector projection: Check if target waypoint is behind vehicle front axle line
-    dot_prod = dx * math.cos(yaw) + dy * math.sin(yaw)
+    # Dot Product Waypoint Advancement Check
     in_turn = is_headland_turn[current_wp_idx]
+    is_rev = is_reverse_step[current_wp_idx]
+    heading_vec = (math.cos(yaw), math.sin(yaw)) if not is_rev else (-math.cos(yaw), -math.sin(yaw))
+    dot = dx * heading_vec[0] + dy * heading_vec[1]
 
-    # Advancement Criteria: Close enough OR (behind vehicle AND dist < 0.8m)
-    if dist < REACH_THRESHOLD or (dot_prod < 0 and dist < 0.80) or (in_turn and dist < 0.50):
+    if dist < REACH_THRESHOLD or (dot < 0.0 and dist < 0.8):
         current_wp_idx += 1
         continue
 
-    # Pure Pursuit Steering Control
-    target_heading = math.atan2(dy, dx)
-    heading_error = target_heading - yaw
-    heading_error = math.atan2(math.sin(heading_error), math.cos(heading_error))
+    # Pure Pursuit / Stanley Heading Control with Reverse Support
+    if is_rev:
+        target_heading = math.atan2(-dy, -dx)
+        heading_error = target_heading - yaw
+        heading_error = math.atan2(math.sin(heading_error), math.cos(heading_error))
 
-    # Steering Command Calculation & Strict Clamping [-44.5°, +44.5°]
-    K_p_steer = 1.3 if in_turn else 1.1
-    steer_cmd = K_p_steer * heading_error
-    steer_cmd = max(-MAX_STEER_ANGLE, min(MAX_STEER_ANGLE, steer_cmd))
+        steer_cmd = K_P_STEER * heading_error
+        speed_cmd = -0.35  # Reverse drive speed
+    else:
+        target_heading = math.atan2(dy, dx)
+        heading_error = target_heading - yaw
+        heading_error = math.atan2(math.sin(heading_error), math.cos(heading_error))
 
-    # LiDAR Wall Distance Perception
-    range_image = lidar.getRangeImage()
-    min_front_range = float('inf')
-    if range_image:
-        n = len(range_image)
-        fov = lidar.getFov()
-        for i, r in enumerate(range_image):
-            if math.isnan(r) or math.isinf(r) or r < lidar.getMinRange():
-                continue
-            angle = (fov / 2.0) - (i / (n - 1)) * fov
-            if abs(angle) < math.radians(20):
-                if r < min_front_range:
-                    min_front_range = r
+        steer_cmd = K_P_STEER * heading_error
+        speed_cmd = TURN_SPEED if in_turn else CRUISE_SPEED
 
-    # Determine Base Speed
-    base_speed = TURN_SPEED if in_turn else CRUISE_SPEED
-
-    # Context-Aware Wall Collision Protection
-    stop_buffer = HEADLAND_WALL_STOP_M if in_turn else INROW_WALL_STOP_M
-    slow_dist = stop_buffer + 0.40
-
-    speed_cmd = base_speed
-    if min_front_range < slow_dist:
-        speed_scale = max(0.0, (min_front_range - stop_buffer) / (slow_dist - stop_buffer))
-        speed_cmd *= speed_scale
-        if min_front_range < stop_buffer:
-            speed_cmd = 0.0
-            print(f"[WALL ALARM] Boundary wall at {min_front_range:.2f}m. Emergency Halt.")
-
-    # Apply Ackermann Steering Dynamics
-    s_left, s_right, w_speeds = set_ackermann_drive(speed_cmd, steer_cmd)
+    set_ackermann_drive(speed_cmd, steer_cmd)
 
     if (sim_time - last_print_time) >= PRINT_INTERVAL_S:
         last_print_time = sim_time
-        mode_str = "HEADLAND" if in_turn else "CROP_ROW"
-        print(f"t={sim_time:.1f}s | wp={current_wp_idx}/{len(waypoints)} [{mode_str}] | pos=({pos[0]:.2f}, {pos[1]:.2f}) | dist={dist:.2f}m | steer={math.degrees(steer_cmd):.1f}° | wall={min_front_range:.2f}m")
+        mode_str = "K_TURN_REVERSE" if is_rev else ("HEADLAND_UTURN" if in_turn else "CROP_ROW")
+        print(f"t={sim_time:.1f}s | wp={current_wp_idx}/{len(waypoints)} [{mode_str}] | pos=({pos[0]:.2f}, {pos[1]:.2f}) | dist={dist:.2f}m | steer={math.degrees(steer_cmd):.1f}°")

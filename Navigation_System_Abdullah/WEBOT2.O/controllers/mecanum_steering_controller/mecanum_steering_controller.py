@@ -1,16 +1,28 @@
 """
-Mecanum Pure Crab-Walk Navigation Controller for Webots (16m x 16m Arena - 9 Crop Rows)
+4-Wheel Crab-Walk Navigation Controller for Webots (16m x 16m Arena - 15 Crop Rows)
 
-Autonomous Weed Removal Robot (AWRR) - Mecanum Kinematics Subsystem
+Autonomous Weed Removal Robot (AWRR) - Crab Kinematics Subsystem
 
-Authoritative Kinematics Formula (matching mecanum_milestoneD_crab.py):
-- In-Row Driving (Forward/Reverse along X):
-  set_mecanum_velocity(vx_body, 0.0, omega) -> fl=+, fr=+, rl=+, rr=+
-- Headland Crab Strafing (Lateral along Y):
-  vy_world = CRAB_SPEED if dy > 0 else -CRAB_SPEED
-  vx_body = -vy_world * math.sin(yaw)
-  vy_body = -vy_world * math.cos(yaw)
-  set_mecanum_velocity(vx_body, vy_body, omega) -> fl=+, fr=-, rl=-, rr=+
+Physical Crab-Walk Mechanics:
+1. Row 1, 3, 5, 7, 9, 11, 13, 15 (West-to-East along +X):
+   - Steering Motors (steer_fl, steer_fr, steer_rl, steer_rr): Set to 0.0 rad (Pointing East).
+   - Drive Motors: Set to +8.67 rad/s (+0.65 m/s forward).
+   - Robot drives East from (-6.8m, Y_i) to (+6.8m, Y_i).
+
+2. East Headland Crab Shift (+Y from Y_i to Y_{i+1}):
+   - Steering Motors (steer_fl, steer_fr, steer_rl, steer_rr): Set to +1.5708 rad (+90°, Pointing North).
+   - Drive Motors: Set to +6.00 rad/s (+0.45 m/s forward).
+   - Robot rolls smoothly North along +Y inside the dark headland strip from (+6.8m, Y_i) to (+6.8m, Y_{i+1}).
+
+3. Row 2, 4, 6, 8, 10, 12, 14 (East-to-West along -X):
+   - Steering Motors (steer_fl, steer_fr, steer_rl, steer_rr): Set to +3.14159 rad (+180°, Pointing West).
+   - Drive Motors: Set to +8.67 rad/s (+0.65 m/s forward).
+   - Robot drives West from (+6.8m, Y_i) to (-6.8m, Y_i) without turning the robot body at all!
+
+4. West Headland Crab Shift (+Y from Y_i to Y_{i+1}):
+   - Steering Motors (steer_fl, steer_fr, steer_rl, steer_rr): Set to +1.5708 rad (+90°, Pointing North).
+   - Drive Motors: Set to +6.00 rad/s (+0.45 m/s forward).
+   - Robot rolls smoothly North along +Y inside the dark headland strip from (-6.8m, Y_i) to (-6.8m, Y_{i+1}).
 """
 
 from controller import Robot
@@ -18,36 +30,40 @@ import math
 import csv
 import os
 
-# --- VEHICLE GEOMETRY & KINEMATICS ---
 TIME_STEP = 32
 
 WHEEL_RADIUS = 0.075    # r: Wheel radius (m)
-WHEELBASE = 0.60        # L: Wheelbase front-to-rear axle (m)
-TRACK_WIDTH = 0.64      # W: Track width left-to-right (m)
-L_W_SUM = (WHEELBASE + TRACK_WIDTH) / 2.0  # 0.62m
+WHEELBASE = 0.60        # L: Wheelbase (m)
+TRACK_WIDTH = 0.64      # W: Track width (m)
 
-MAX_WHEEL_VEL = 20.0    # Actuator maximum angular speed (rad/s)
-
-# --- SPEED & NAVIGATION TUNING ---
-CRUISE_SPEED = 0.65     # Linear speed in crop row (m/s)
-CRAB_SPEED = 0.45       # Lateral crab-strafing speed in headland (m/s)
-REACH_THRESHOLD = 0.30  # Waypoint acceptance radius (m)
+CRUISE_SPEED = 0.65     # Max row speed (m/s)
+CRAB_SPEED = 0.45       # Max headland crab speed (m/s)
+REACH_THRESHOLD = 0.25  # Waypoint reach tolerance (m)
 
 # Logging
 LOG_EVERY_N_STEPS = 16
 PRINT_INTERVAL_S = 1.0
 
-# --- ROBOT & SENSOR INITIALIZATION ---
 robot = Robot()
 
-# 1. Drive Motors
-motor_names = ['wheel_fl_motor', 'wheel_fr_motor', 'wheel_rl_motor', 'wheel_rr_motor']
-motors = [robot.getDevice(name) for name in motor_names]
-for m in motors:
-    m.setPosition(float('inf'))
-    m.setVelocity(0.0)
+# 1. Steering Motors (steer_fl, steer_fr, steer_rl, steer_rr)
+steer_fl = robot.getDevice('steer_fl_motor')
+steer_fr = robot.getDevice('steer_fr_motor')
+steer_rl = robot.getDevice('steer_rl_motor')
+steer_rr = robot.getDevice('steer_rr_motor')
+steer_motors = [steer_fl, steer_fr, steer_rl, steer_rr]
 
-# 2. Perception & Sensors
+for sm in steer_motors:
+    sm.setVelocity(12.0)
+
+# 2. Drive Motors (wheel_fl, wheel_fr, wheel_rl, wheel_rr)
+motor_names = ['wheel_fl_motor', 'wheel_fr_motor', 'wheel_rl_motor', 'wheel_rr_motor']
+drive_motors = [robot.getDevice(name) for name in motor_names]
+for dm in drive_motors:
+    dm.setPosition(float('inf'))
+    dm.setVelocity(0.0)
+
+# 3. Perception & Sensors
 gps = robot.getDevice('gps')
 gps.enable(TIME_STEP)
 imu = robot.getDevice('imu')
@@ -56,62 +72,50 @@ lidar = robot.getDevice('lidar')
 lidar.enable(TIME_STEP)
 
 
-def set_mecanum_velocities(vx, vy, omega):
+def set_crab_drive(steer_angle_rad, drive_speed_m_s):
     """
-    Exact Mecanum inverse kinematics matching mecanum_milestoneD_crab.py:
-    fl = (vx - vy - L_W_SUM * omega) / WHEEL_RADIUS
-    fr = (vx + vy + L_W_SUM * omega) / WHEEL_RADIUS
-    rl = (vx + vy - L_W_SUM * omega) / WHEEL_RADIUS
-    rr = (vx - vy + L_W_SUM * omega) / WHEEL_RADIUS
+    Sets all 4 wheel steering angles and drive motor velocities.
     """
-    fl = (vx - vy - L_W_SUM * omega) / WHEEL_RADIUS
-    fr = (vx + vy + L_W_SUM * omega) / WHEEL_RADIUS
-    rl = (vx + vy - L_W_SUM * omega) / WHEEL_RADIUS
-    rr = (vx - vy + L_W_SUM * omega) / WHEEL_RADIUS
+    for sm in steer_motors:
+        sm.setPosition(steer_angle_rad)
 
-    wheel_speeds = [fl, fr, rl, rr]
-    max_speed = max(abs(s) for s in wheel_speeds)
-    if max_speed > MAX_WHEEL_VEL:
-        scale = MAX_WHEEL_VEL / max_speed
-        wheel_speeds = [s * scale for s in wheel_speeds]
-
-    for i in range(4):
-        motors[i].setVelocity(wheel_speeds[i])
-
-    return wheel_speeds
+    w_speed = drive_speed_m_s / WHEEL_RADIUS
+    w_speed = max(-25.0, min(25.0, w_speed))
+    for dm in drive_motors:
+        dm.setVelocity(w_speed)
 
 
-def generate_9row_crab_waypoints():
+def generate_15row_headland_crab_waypoints():
     """
-    Generates exact 9 Crop Row Crab-Walk waypoints:
-    - 9 Crop Rows at Y = [-6.4, -4.8, -3.2, -1.6, 0.0, 1.6, 3.2, 4.8, 6.4m]
-    - Row endpoints: X = ±5.0m
+    Generates 15 Crop Row Crab-Walk waypoints extending into 1.25m headlands:
+    - 15 Crop Rows at Y = [-7.0, -6.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0m]
+    - Row endpoints extended into dark headland strips at X = ±6.8m
     """
     waypoints = []
-    y_rows = [-6.4, -4.8, -3.2, -1.6, 0.0, 1.6, 3.2, 4.8, 6.4]
+    y_rows = [-7.0, -6.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]
 
     for i, y in enumerate(y_rows):
         if i % 2 == 0:
-            # West-to-East Row: (-5.0, Y_i) -> (+5.0, Y_i)
-            waypoints.append((-5.0, y))
-            waypoints.append((5.0, y))
+            # West-to-East: Drive from (-6.8, Y_i) to (+6.8, Y_i) [Headland to Headland]
+            waypoints.append((-6.8, y))
+            waypoints.append((6.8, y))
         else:
-            # East-to-West Row: (+5.0, Y_i) -> (-5.0, Y_i)
-            waypoints.append((5.0, y))
-            waypoints.append((-5.0, y))
+            # East-to-West: Drive from (+6.8, Y_i) to (-6.8, Y_i) [Headland to Headland]
+            waypoints.append((6.8, y))
+            waypoints.append((-6.8, y))
 
     return waypoints
 
-def is_row_switch_target(idx):
-    # Segment driving TOWARD waypoint idx is a row switch (pure lateral move)
-    # when idx is even and not the very first target (idx == 0 is initial spawn).
+def is_headland_crab_segment(idx):
+    # Segment driving TOWARD waypoint idx is a headland crab shift along +Y
+    # when idx is even and not the initial spawn.
     return idx % 2 == 0 and idx > 0
 
-waypoints = generate_9row_crab_waypoints()
+waypoints = generate_15row_headland_crab_waypoints()
 current_wp_idx = 0
 
-print(f"[Mecanum Crab Nav] Generated {len(waypoints)} waypoints for 9-row Crab-Walk.")
-print(f"[Mecanum Crab Nav] Start: {waypoints[0]} | End: {waypoints[-1]}")
+print(f"[Crab Nav 15m] Generated {len(waypoints)} waypoints for 15-row Crab-Walk.")
+print(f"[Crab Nav 15m] Start: {waypoints[0]} | End: {waypoints[-1]}")
 
 trajectory_log = []
 step_count = 0
@@ -123,15 +127,15 @@ while robot.step(TIME_STEP) != -1:
     sim_time = robot.getTime()
 
     if current_wp_idx >= len(waypoints):
-        print(f"[Mecanum Crab Nav] ALL {len(waypoints)} WAYPOINTS COMPLETE. Final Position Reached.")
-        set_mecanum_velocities(0.0, 0.0, 0.0)
+        print(f"[Crab Nav 15m] ALL {len(waypoints)} WAYPOINTS COMPLETE. Final Position Reached.")
+        set_crab_drive(0.0, 0.0)
 
         os.makedirs("results", exist_ok=True)
         with open("results/mecanum_16m_dense_navigation_log.csv", "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["time", "x", "y", "yaw", "steer_cmd_deg"])
             writer.writerows(trajectory_log)
-        print(f"[Mecanum Crab Nav] Logged trajectory to results/mecanum_16m_dense_navigation_log.csv")
+        print(f"[Crab Nav 15m] Logged trajectory to results/mecanum_16m_dense_navigation_log.csv")
         break
 
     # Read Sensors
@@ -152,38 +156,32 @@ while robot.step(TIME_STEP) != -1:
     if step_count % LOG_EVERY_N_STEPS == 0:
         trajectory_log.append((sim_time, pos[0], pos[1], yaw, 0.0))
 
-    # Waypoint Advancement Check
+    # Waypoint Advancement Check (0.25m threshold)
     if dist < REACH_THRESHOLD:
         current_wp_idx += 1
-        print(f"[Mecanum Crab Nav] Reached Waypoint {current_wp_idx}/{len(waypoints)}")
+        print(f"[Crab Nav 15m] Reached Waypoint {current_wp_idx}/{len(waypoints)} at pos=({pos[0]:.2f}, {pos[1]:.2f})")
         continue
 
-    # Navigation Control Logic (matching mecanum_milestoneD_crab.py)
-    if is_row_switch_target(current_wp_idx):
-        # --- CRAB MODE: Pure Lateral Strafe along Y, hold heading at 0.0° ---
-        vy_world = CRAB_SPEED if dy > 0 else -CRAB_SPEED
-        vx_body = -vy_world * math.sin(yaw)
-        vy_body = -vy_world * math.cos(yaw)
+    # Navigation Control Logic
+    if is_headland_crab_segment(current_wp_idx):
+        # --- HEADLAND CRAB SHIFT: Rotate wheels 90° (+1.5708 rad), roll North along +Y inside headland ---
+        steer_target = 1.5708  # 90° (Pointing North)
+        drive_target = CRAB_SPEED if dy > 0 else -CRAB_SPEED
 
-        heading_error = 0.0 - yaw
-        heading_error = math.atan2(math.sin(heading_error), math.cos(heading_error))
-        omega = max(-1.0, min(1.0, 2.0 * heading_error))
-
-        set_mecanum_velocities(vx_body, vy_body, omega)
+        set_crab_drive(steer_target, drive_target)
         mode_str = "CRAB_HEADLAND"
     else:
-        # --- IN-ROW MODE: Drive along X ---
-        target_heading = math.atan2(dy, dx)
-        heading_error = target_heading - yaw
-        heading_error = math.atan2(math.sin(heading_error), math.cos(heading_error))
+        # --- IN-ROW CROP PASS: 0° (Pointing East) or 180° (Pointing West) ---
+        if dx > 0:
+            # West-to-East: Steer = 0.0 rad (East), Drive = +0.65 m/s
+            steer_target = 0.0
+            drive_target = CRUISE_SPEED
+        else:
+            # East-to-West: Steer = 3.14159 rad (West), Drive = +0.65 m/s
+            steer_target = math.pi
+            drive_target = CRUISE_SPEED
 
-        omega = max(-1.0, min(1.0, 1.5 * heading_error))
-        speed_cap = CRUISE_SPEED if abs(heading_error) < math.radians(20) else 0.40
-        forward_speed = min(speed_cap, dist) * max(0.0, math.cos(heading_error))
-        if dx < 0:
-            forward_speed = -min(speed_cap, dist)
-
-        set_mecanum_velocities(forward_speed, 0.0, omega)
+        set_crab_drive(steer_target, drive_target)
         mode_str = "CROP_ROW"
 
     if (sim_time - last_print_time) >= PRINT_INTERVAL_S:
