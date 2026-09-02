@@ -1,0 +1,72 @@
+# Blender 5.0.1 MTL File: 'bean_3weed_01.blend'
+# www.blender.org
+
+newmtl knotweed
+Ns 18.987537
+Ka 1.000000 1.000000 1.000000
+Ks 0.240157 0.240157 0.240157
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd polygonum_leaf.jpg
+map_d polygonum_leaf.jpg
+
+newmtl knotweed.001
+Ns 18.987537
+Ka 1.000000 1.000000 1.000000
+Ks 0.240157 0.240157 0.240157
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd polygonum_leaf.jpg
+map_d polygonum_leaf.jpg
+
+newmtl knotweed.002
+Ns 18.987537
+Ka 1.000000 1.000000 1.000000
+Ks 0.240157 0.240157 0.240157
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd polygonum_leaf.jpg
+map_d polygonum_leaf.jpg
+
+newmtl knotweed.003
+Ns 18.987537
+Ka 1.000000 1.000000 1.000000
+Ks 0.240157 0.240157 0.240157
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd polygonum_leaf.jpg
+map_d polygonum_leaf.jpg
+
+newmtl knotweed.004
+Ns 18.987537
+Ka 1.000000 1.000000 1.000000
+Ks 0.240157 0.240157 0.240157
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd polygonum_leaf.jpg
+map_d polygonum_leaf.jpg
+
+newmtl knotweed.005
+Ns 18.987537
+Ka 1.000000 1.000000 1.000000
+Ks 0.240157 0.240157 0.240157
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd polygonum_leaf.jpg
+map_d polygonum_leaf.jpg
+
+newmtl knotweed.006
+Ns 18.987537
+Ka 1.000000 1.000000 1.000000
+Ks 0.240157 0.240157 0.240157
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd polygonum_leaf.jpg
+map_d polygonum_leaf.jpg

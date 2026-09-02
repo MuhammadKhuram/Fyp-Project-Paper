@@ -1,0 +1,94 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.05401696373220599 0.8895275240177114 -0.45367714472306553 0.38273969839924316
+  position -1.321611209289761 0.06608499211355282 0.6349634615496103
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Floor {
+  size 1 1
+}
+Robot {
+  name "delta_leg_supervisor"
+  controller "<extern>"
+  supervisor TRUE
+}
+DEF UPPER_ARM Solid {
+  translation 0 -0.09519658919950813 0.269885620298259
+  rotation 1 0 0 2.0965977431038434
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.8 0.2 0.2
+        roughness 0.6
+        metalness 0
+      }
+      geometry Cylinder {
+        height 0.12
+        radius 0.006
+      }
+    }
+  ]
+  name "upper_arm"
+}
+DEF FOREARM_A Solid {
+  translation 0.015 -0.05576283246976748 0.16988562029825904
+  rotation -1 0 0 2.2239588971511135
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.2 0.2 0.8
+        roughness 0.6
+        metalness 0
+      }
+      geometry Cylinder {
+        height 0.23
+        radius 0.004
+      }
+    }
+  ]
+  name "forearm_a"
+}
+DEF FOREARM_B Solid {
+  translation -0.015 -0.05576283246976748 0.16988562029825904
+  rotation -1 0 0 2.2239588971511135
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.2 0.2 0.8
+        roughness 0.6
+        metalness 0
+      }
+      geometry Cylinder {
+        height 0.23
+        radius 0.004
+      }
+    }
+  ]
+  name "forearm_b"
+}
+DEF TARGET Solid {
+  translation 0 0.05 0.1
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.1 0.9 0.1
+        roughness 0.4
+        metalness 0
+      }
+      geometry Sphere {
+        radius 0.008
+      }
+    }
+  ]
+  name "target_marker"
+}

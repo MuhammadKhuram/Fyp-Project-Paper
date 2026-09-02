@@ -1,0 +1,72 @@
+# Blender 5.0.1 MTL File: 'bean_3weed_01.blend'
+# www.blender.org
+
+newmtl portulaca
+Ns 26.055565
+Ka 1.000000 1.000000 1.000000
+Ks 0.137795 0.137795 0.137795
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd portulaca.jpg
+map_d portulaca.jpg
+
+newmtl portulaca.001
+Ns 26.055565
+Ka 1.000000 1.000000 1.000000
+Ks 0.137795 0.137795 0.137795
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd portulaca.jpg
+map_d portulaca.jpg
+
+newmtl portulaca.002
+Ns 26.055565
+Ka 1.000000 1.000000 1.000000
+Ks 0.137795 0.137795 0.137795
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd portulaca.jpg
+map_d portulaca.jpg
+
+newmtl portulaca.003
+Ns 26.055565
+Ka 1.000000 1.000000 1.000000
+Ks 0.137795 0.137795 0.137795
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd portulaca.jpg
+map_d portulaca.jpg
+
+newmtl portulaca.004
+Ns 26.055565
+Ka 1.000000 1.000000 1.000000
+Ks 0.137795 0.137795 0.137795
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd portulaca.jpg
+map_d portulaca.jpg
+
+newmtl portulaca.005
+Ns 26.055565
+Ka 1.000000 1.000000 1.000000
+Ks 0.137795 0.137795 0.137795
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd portulaca.jpg
+map_d portulaca.jpg
+
+newmtl portulaca.006
+Ns 26.055565
+Ka 1.000000 1.000000 1.000000
+Ks 0.137795 0.137795 0.137795
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd portulaca.jpg
+map_d portulaca.jpg

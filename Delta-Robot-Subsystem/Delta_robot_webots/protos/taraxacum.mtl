@@ -1,0 +1,72 @@
+# Blender 5.0.1 MTL File: 'bean_3weed_01.blend'
+# www.blender.org
+
+newmtl taraxacum_leaf
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd taraxacum.jpg
+map_d taraxacum.jpg
+
+newmtl taraxacum_leaf.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd taraxacum.jpg
+map_d taraxacum.jpg
+
+newmtl taraxacum_leaf.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd taraxacum.jpg
+map_d taraxacum.jpg
+
+newmtl taraxacum_leaf.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd taraxacum.jpg
+map_d taraxacum.jpg
+
+newmtl taraxacum_leaf.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd taraxacum.jpg
+map_d taraxacum.jpg
+
+newmtl taraxacum_leaf.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd taraxacum.jpg
+map_d taraxacum.jpg
+
+newmtl taraxacum_leaf.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd taraxacum.jpg
+map_d taraxacum.jpg

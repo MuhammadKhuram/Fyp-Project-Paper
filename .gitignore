@@ -5,3 +5,4 @@ preview_*.txt
 *_dump.txt
 *_backup.docx
 Delta-Robot-Subsystem/ecc_repo/
+*.vscode/*

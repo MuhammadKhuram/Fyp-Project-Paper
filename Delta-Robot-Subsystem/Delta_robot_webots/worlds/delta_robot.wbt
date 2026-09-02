@@ -1,0 +1,603 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  fieldOfView 0.785399
+  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
+  position 4.256880147280739 1.3876860451649824 15.293836905682292
+}
+TexturedBackground {
+  luminosity 3
+}
+TexturedBackgroundLight {
+  texture "noon_cloudy_countryside"
+}
+DEF CROP_FIELD Pose {
+  children [
+    Solid {
+      rotation 1 0 0 0
+      children [
+        CadShape {
+          url [
+            "../protos/ground.obj"
+          ]
+        }
+      ]
+      name "ground"
+    }
+    Solid {
+      children [
+        Pose {
+          children [
+            CadShape {
+              url [
+                "../protos/bed1.obj"
+              ]
+            }
+          ]
+        }
+      ]
+      name "bed1"
+    }
+    Solid {
+      children [
+        CadShape {
+          url [
+            "../protos/polygonum.obj"
+          ]
+        }
+      ]
+      name "polygonum"
+    }
+    Solid {
+      children [
+        CadShape {
+          url [
+            "../protos/portulaca.obj"
+          ]
+        }
+      ]
+      name "portulaca"
+    }
+    Solid {
+      children [
+        CadShape {
+          url [
+            "../protos/stones.obj"
+          ]
+        }
+      ]
+      name "stones"
+    }
+    Solid {
+      children [
+        CadShape {
+          url [
+            "../protos/taraxacum.obj"
+          ]
+        }
+      ]
+      name "taraxacum"
+    }
+  ]
+}
+Robot {
+  children [
+    Pose {
+      translation 0 0 0.29
+      rotation 0 1 0 1.5707996938995747
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.8 0.8 0.8
+            roughness 0.5
+            metalness 0.8
+          }
+          geometry Box {
+            size 0.01 0.09 0.022
+          }
+        }
+        Camera {
+          name "rgb_camera"
+          fieldOfView 0.956
+          width 640
+          height 480
+        }
+        RangeFinder {
+          name "depth_camera"
+          fieldOfView 0.956
+          width 640
+          height 480
+          maxRange 2
+        }
+      ]
+    }
+    DEF BASE Solid {
+      translation 0 0 0.285
+      rotation 0 0 1 -1.570796
+      children [
+        Transform {
+          scale 0.0009 0.0009 0.0008
+          children [
+            Shape {
+              appearance DEF SOLID_COLOR PBRAppearance {
+                baseColor 0.259998 0.259998 0.259998
+                roughness 0.4
+                metalness 0.8
+              }
+              geometry Mesh {
+                url [
+                  "meshes/base_plate.obj"
+                ]
+              }
+            }
+            Shape {
+              appearance USE SOLID_COLOR
+              geometry Mesh {
+                url [
+                  "meshes/base_plate.obj"
+                ]
+                ccw FALSE
+              }
+            }
+          ]
+        }
+      ]
+      name "base"
+    }
+    DEF PLATFORM Solid {
+      translation 0.040935599743718035 -0.040935599743718035 0.0963742398974872
+      children [
+        Shape {
+          appearance USE SOLID_COLOR
+          geometry Cylinder {
+            height 0.01
+            radius 0.02
+          }
+        }
+      ]
+      name "platform"
+    }
+    DEF TARGET Solid {
+      translation 0.040935599743718035 -0.040935599743718035 0.0963742398974872
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.929412 0.2 0.231373
+            roughness 0.4
+            metalness 0
+            emissiveColor 0.929412 0.2 0.231373
+          }
+          geometry Sphere {
+            radius 0.008
+          }
+        }
+      ]
+      name "target_marker"
+    }
+    DEF UPPER_ARM_1 Solid {
+      translation 0 -0.10325635290380708 0.29767878120650937
+      rotation 1 0 0 1.6094929635455222
+      children [
+        Shape {
+          appearance DEF ANODIZED_RED PBRAppearance {
+            baseColor 0.8 0.0509804 0.0509804
+            roughness 0.3
+            metalness 0.8
+          }
+          geometry Cylinder {
+            height 0.12
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.06
+          children [
+            Shape {
+              appearance DEF CHROME PBRAppearance {
+                roughness 0.3
+              }
+              geometry Sphere {
+                radius 0.007
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 0.06
+          rotation 0 1 0 1.570796
+          children [
+            Shape {
+              appearance DEF joint_rod_black PBRAppearance {
+                baseColor 0 0 0
+                roughness 0.2
+                metalness 0
+                IBLStrength 0
+              }
+              geometry Cylinder {
+                height 0.036
+                radius 0.002
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.06
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.06
+          rotation 0 1 0 1.570796
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Cylinder {
+                height 0.036
+                radius 0.0025
+              }
+            }
+          ]
+        }
+      ]
+      name "upper_arm_1"
+    }
+    DEF FOREARM_1A Solid {
+      translation 0.03546779987185902 -0.10929039604592544 0.19586590115525293
+      rotation -0.934911304049184 0.35488146409900584 0 2.6162355081536326
+      children [
+        Shape {
+          appearance DEF CARBON_FIBER PBRAppearance {
+            baseColor 0.109804 0.443137 0.847059
+            roughness 0.3
+            metalness 0.7
+          }
+          geometry Cylinder {
+            height 0.23
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+      ]
+      name "forearm_1a"
+    }
+    DEF FOREARM_1B Solid {
+      translation 0.005467799871859018 -0.10929039604592544 0.19586590115525293
+      rotation -0.934911304049184 0.35488146409900584 0 2.6162355081536326
+      children [
+        Shape {
+          appearance USE CARBON_FIBER
+          geometry Cylinder {
+            height 0.23
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+      ]
+      name "forearm_1b"
+    }
+    DEF UPPER_ARM_2 Solid {
+      translation 0.08845950509439911 0.05107211907863238 0.2882737422545859
+      rotation -0.49999999999999994 0.8660254037844387 0 1.7674999913457652
+      children [
+        Shape {
+          appearance USE ANODIZED_RED
+          geometry Cylinder {
+            height 0.12
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.06
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.007
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 0.06
+          rotation -0.8660253028382762 -0.5000001748438417 0 1.570796
+          children [
+            Shape {
+              appearance USE joint_rod_black
+              geometry Cylinder {
+                height 0.036
+                radius 0.002
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.06
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.0065
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.06
+          rotation -0.8660253028382762 -0.5000001748438417 0 1.570796
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Cylinder {
+                height 0.036
+                radius 0.0025
+              }
+            }
+          ]
+        }
+      ]
+      name "upper_arm_2"
+    }
+    DEF FOREARM_2A Solid {
+      translation 0.08892730496625813 0.036377821898669616 0.18646086220332952
+      rotation 0.7989102669517176 -0.6014502351476265 0 2.470852671950298
+      children [
+        Shape {
+          appearance USE CARBON_FIBER
+          geometry Cylinder {
+            height 0.23
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+      ]
+      name "forearm_2a"
+    }
+    DEF FOREARM_2B Solid {
+      translation 0.10392730496625813 0.010397059785136456 0.18646086220332952
+      rotation 0.7989102669517175 -0.6014502351476266 0 2.470852671950298
+      children [
+        Shape {
+          appearance USE CARBON_FIBER
+          geometry Cylinder {
+            height 0.23
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+      ]
+      name "forearm_2b"
+    }
+    DEF UPPER_ARM_3 Solid {
+      translation -0.08062348216115821 0.04654798912874974 0.2665263230523591
+      rotation -0.5000000000000003 -0.8660254037844385 0 2.162643080150319
+      children [
+        Shape {
+          appearance USE ANODIZED_RED
+          geometry Cylinder {
+            height 0.12
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.06
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.007
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 0.06
+          rotation 0.8660253028382762 -0.5000001748438417 0 1.570796
+          children [
+            Shape {
+              appearance USE joint_rod_black
+              geometry Cylinder {
+                height 0.036
+                radius 0.002
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.06
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.0065
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.06
+          rotation 0.8660253028382762 -0.5000001748438417 0 1.570796
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Cylinder {
+                height 0.036
+                radius 0.0025
+              }
+            }
+          ]
+        }
+      ]
+      name "upper_arm_3"
+    }
+    DEF FOREARM_3A Solid {
+      translation -0.05515568228929921 0.005872929835253813 0.16471344300110274
+      rotation 0.5685041271909974 0.8226804102242875 0 2.20713404210868
+      children [
+        Shape {
+          appearance USE CARBON_FIBER
+          geometry Cylinder {
+            height 0.23
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+      ]
+      name "forearm_3a"
+    }
+    DEF FOREARM_3B Solid {
+      translation -0.0401556822892992 0.03185369194878697 0.16471344300110274
+      rotation 0.5685041271909975 0.8226804102242875 0 2.20713404210868
+      children [
+        Shape {
+          appearance USE CARBON_FIBER
+          geometry Cylinder {
+            height 0.23
+            radius 0.004
+          }
+        }
+        Pose {
+          translation 0 0 0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -0.115
+          children [
+            Shape {
+              appearance USE CHROME
+              geometry Sphere {
+                radius 0.006
+              }
+            }
+          ]
+        }
+      ]
+      name "forearm_3b"
+    }
+  ]
+  name "delta_supervisor"
+  controller "<extern>"
+  supervisor TRUE
+}
