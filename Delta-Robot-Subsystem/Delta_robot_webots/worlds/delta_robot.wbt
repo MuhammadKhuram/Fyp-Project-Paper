@@ -7,18 +7,20 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 0.785399
-  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
-  position 4.256880147280739 1.3876860451649824 15.293836905682292
+  orientation -0.5255778897478497 0.5415869375648145 0.6560880054286641 1.9526260069274926
+  position 1.5111868026552369 -2.1044222247225455 7.971839757552695
 }
 TexturedBackground {
-  luminosity 3
+  luminosity 4
 }
 TexturedBackgroundLight {
   texture "noon_cloudy_countryside"
+  luminosity 1.4
 }
 DEF CROP_FIELD Pose {
   children [
     Solid {
+      translation 0 0 -0.01
       rotation 1 0 0 0
       children [
         CadShape {
@@ -44,13 +46,6 @@ DEF CROP_FIELD Pose {
       name "bed1"
     }
     Solid {
-      children [
-        CadShape {
-          url [
-            "../protos/polygonum.obj"
-          ]
-        }
-      ]
       name "polygonum"
     }
     Solid {
@@ -86,9 +81,10 @@ DEF CROP_FIELD Pose {
   ]
 }
 Robot {
+  translation 0 -0.38 0
   children [
     Pose {
-      translation 0 0 0.29
+      translation 0.4 0 0.4
       rotation 0 1 0 1.5707996938995747
       children [
         Shape {
@@ -103,13 +99,13 @@ Robot {
         }
         Camera {
           name "rgb_camera"
-          fieldOfView 0.956
+          fieldOfView 1.2
           width 640
           height 480
         }
         RangeFinder {
           name "depth_camera"
-          fieldOfView 0.956
+          fieldOfView 1.2
           width 640
           height 480
           maxRange 2

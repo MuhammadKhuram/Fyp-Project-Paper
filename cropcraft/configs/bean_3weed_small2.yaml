@@ -1,0 +1,76 @@
+output_enabled: [blender, gazebo]
+output:
+  blender:
+    type: blender_file
+    filename: bean_3weed_small2.blend
+  gazebo:
+    type: gazebo_model
+    name: bean_3weed_small2
+
+field:
+  headland_width: 3.0
+  scattering_extra_width: 1.0
+  random_seed: 123456789   # fixed seed so you can regenerate the exact same field
+
+  beds:
+    bed1:
+      plant_type: bean
+      plant_height: .05
+      height_tolerance_coeff: .15
+      row_distance: .75
+      rows_count: 6
+      plants_count: 60
+      plant_distance: .15
+      bed_width: 3.0
+      orientation: random
+
+  noise:
+    position: .016
+    tilt: .05
+    missing: .12
+    scale: .10
+
+  weeds:
+    portulaca:
+      plant_type: portulaca
+      density: 5.
+      distance_min: 0.15
+      max_height: 0.01
+      scattering_mode: image
+      scattering_img: ../examples/row_side_bands_mask.png
+      noise_scale: 0.0
+      noise_offset: 0.0
+      
+
+    taraxacum:
+      plant_type: taraxacum
+      density: 4.
+      distance_min: 0.20
+      max_height: 0.014
+      scattering_mode: image
+      scattering_img: ../examples/row_side_bands_mask.png
+      noise_scale: 0.0
+      noise_offset: 0.0
+
+  stones:
+    density: 4.
+    distance_min: 0.05
+    noise_scale: 0.10
+    noise_offset: 0.06
+
+
+render: # i added render section to make datastet
+  directory: render
+  frames: 100
+  samples: 12 # 32 initially
+  camera:
+    height: 0.5 # 0.5 inittially
+    fov_deg: 60.0
+    roll_deg: 10.0
+    pitch_deg: 10.0
+    yaw_deg: 10.0
+    y_jitter: 0.5 # 0.1 inittially
+  label_colors:
+    crop: [0, 255, 0]
+    weed: [255, 0, 0]
+    background: [0, 0, 0]

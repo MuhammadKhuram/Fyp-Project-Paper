@@ -175,7 +175,7 @@ def scattering_from_image_node_group():
 	image_texture = scattering.nodes.new("GeometryNodeImageTexture")
 	image_texture.name = "Image Texture"
 	image_texture.extension = 'REPEAT'
-	image_texture.interpolation = 'Linear'
+	image_texture.interpolation = 'Closest'
 	# Frame
 	image_texture.inputs[2].default_value = 0
 	
